@@ -1,0 +1,10 @@
+version = 0.1
+
+[default.global.parameters]
+stack_name = "caddie-coach"
+
+[default.deploy.parameters]
+resolve_image_repos = true   # let SAM create/manage the ECR repo for the image
+capabilities = "CAPABILITY_IAM"
+region = "us-east-1"
+confirm_changeset = true
