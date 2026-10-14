@@ -86,14 +86,25 @@ npm test
 
 36 tests: the dispersion model, caddie engine, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
 
-## Deploy and connect to Alexa+
+## Deploy to AWS
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Alexa+ needs a remote HTTPS Streamable HTTP endpoint and OAuth/OIDC with the `resource` parameter set to the server's canonical URI.
+The server ships as a container image and runs on AWS Lambda behind an HTTPS Function URL (via the Lambda Web Adapter), with state in DynamoDB and recaps from Bedrock. One command, with the [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) and Docker:
+
+```bash
+cd infra
+sam build && sam deploy
+```
+
+`sam deploy` prints the Function URL; the MCP endpoint is that URL + `/mcp`. Full steps, the Bedrock option and teardown are in [infra/README.md](infra/README.md).
+
+## Connect to Alexa+
+
+Alexa+ needs a remote HTTPS Streamable HTTP endpoint (the Function URL above) and OAuth/OIDC with the `resource` parameter set to the server's canonical URI. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Status
 
-Working: all seven tools, personal model, pattern detection, swing analysis, round report, both cards, capture page, contract tests.
-In progress: AWS deployment, OAuth/OIDC, Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
+Working: all seven tools, personal model, pattern detection, swing analysis, round report, both cards, capture page, contract tests, and the SAM deploy stack (Lambda + Function URL + DynamoDB + Bedrock).
+In progress: running the stack in a live AWS account, OAuth/OIDC, Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
 
 ## License
 
