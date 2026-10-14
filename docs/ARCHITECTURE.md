@@ -9,7 +9,7 @@
 | Swing capture | `/capture` page, MediaPipe Pose Landmarker (lite) in the browser, uploads keypoints to `/api/swings` | Built, not yet tested on a real camera |
 | Per-user state | Amazon DynamoDB (`userId` partition key), in-memory store for local dev | Code done, table not deployed |
 | Round recap | Amazon Bedrock Converse API with template fallback | Code done, not yet run against Bedrock |
-| UI cards | MCP App resources `ui://caddie-coach/round-report`, `ui://caddie-coach/swing` | Done, not yet verified on Alexa+ |
+| UI cards | MCP App resources `ui://caddie-coach/round-report`, `ui://caddie-coach/swing` | Done; conforms to MCP Apps SEP-1865 (ui:// URIs, `text/html;profile=mcp-app`, `_meta.ui.resourceUri` tool linkage, `ui/initialize` + `ui/notifications/tool-result` postMessage), not yet rendered on a live Alexa+ |
 | Hosting | AWS Lambda (container image) behind an HTTPS Function URL, via the Lambda Web Adapter | SAM stack in `infra/`, deploy pending AWS account |
 | Auth | OAuth/OIDC (Amazon Cognito), `resource` = canonical server URI | Planned |
 | Alexa+ bridge | Alexa AI CLI add-on (`alexa-ai new mcp`, `alexa-ai deploy`) | Planned |
