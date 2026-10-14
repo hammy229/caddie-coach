@@ -10,7 +10,7 @@
 | Per-user state | Amazon DynamoDB (`userId` partition key), in-memory store for local dev | Code done, table not deployed |
 | Round recap | Amazon Bedrock Converse API with template fallback | Code done, not yet run against Bedrock |
 | UI cards | MCP App resources `ui://caddie-coach/round-report`, `ui://caddie-coach/swing` | Done, not yet verified on Alexa+ |
-| Hosting | AWS, HTTPS endpoint | Planned |
+| Hosting | AWS Lambda (container image) behind an HTTPS Function URL, via the Lambda Web Adapter | SAM stack in `infra/`, deploy pending AWS account |
 | Auth | OAuth/OIDC (Amazon Cognito), `resource` = canonical server URI | Planned |
 | Alexa+ bridge | Alexa AI CLI add-on (`alexa-ai new mcp`, `alexa-ai deploy`) | Planned |
 
@@ -20,7 +20,7 @@
 2. The server builds a request-scoped MCP server, runs the tool against the golfer's state, and saves changes.
 3. Alexa+ speaks the tool's text and, for `end_round` and `analyze_swing`, renders the linked card.
 
-The server is stateless per request, so it fits Lambda or App Runner. All durable data is in the `StateStore`.
+The server is stateless per request, so it fits Lambda or App Runner. All durable data is in the `StateStore`. The deployment path is a Lambda container image run by the [Lambda Web Adapter](https://github.com/awslabs/aws-lambda-web-adapter), exposed through a Function URL in `RESPONSE_STREAM` mode so the MCP SSE responses stream back. See `infra/` for the SAM stack and `infra/README.md` for deploy steps.
 
 ## How "proactive" works
 
@@ -48,5 +48,14 @@ with `w` = 2 (safe), 1 (normal), 0.35 (aggressive). Aggressive play also slightl
 
 - **DynamoDB**: `server/src/state/dynamo.ts`. One item per golfer keyed by `userId` holding shots, swings and rounds.
 - **Bedrock**: `server/src/domain/narrator.ts` (`BedrockNarrator`) turns the structured round report into a short spoken recap, constrained to facts in the report.
+- **Lambda + Function URL**: `infra/template.yaml` deploys the container image to Lambda with a public HTTPS Function URL (`RESPONSE_STREAM`). The function's IAM role grants DynamoDB CRUD on the table and `bedrock:InvokeModel`.
 
-Update this section with deployment details, regions and IAM scope as they are finalized.
+## Deployment
+
+The SAM stack in `infra/` provisions, in one `sam deploy`:
+
+1. **`CaddieTable`** — DynamoDB, on-demand billing, partition key `userId`.
+2. **`CaddieFunction`** — Lambda from the `server/Dockerfile` image (arm64), env `DDB_TABLE` and `BEDROCK_MODEL_ID` wired in, least-privilege IAM.
+3. **Function URL** — HTTPS endpoint in `RESPONSE_STREAM` mode; the MCP endpoint is the URL + `/mcp`.
+
+Region defaults to `us-east-1` (`infra/samconfig.toml`). Everything stays within the AWS free tier at demo scale.
