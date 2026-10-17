@@ -5,6 +5,7 @@ import { createNarrator, type Narrator } from "./domain/narrator.js";
 import { buildServer } from "./server.js";
 import { createStore, type StateStore } from "./state/index.js";
 import { CAPTURE_HTML } from "./web/capture.js";
+import { HOME_HTML } from "./web/home.js";
 import { swingUploadHandler } from "./web/swings.js";
 
 export interface AppDeps {
@@ -26,6 +27,10 @@ export function createApp(deps: AppDeps): Express {
   const today = deps.today ?? todayISO;
   const app = express();
   app.use(express.json({ limit: "2mb" }));
+
+  app.get("/", (_req, res) => {
+    res.type("html").send(HOME_HTML);
+  });
 
   app.get("/health", (_req, res) => {
     res.json({ ok: true });
