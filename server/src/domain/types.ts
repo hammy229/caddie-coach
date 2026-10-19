@@ -32,6 +32,12 @@ export interface Round {
   risk: Risk;
   ended: boolean;
   strokes?: number;
+  /** Par for the course, if known. */
+  par?: number;
+  /** USGA course rating, if known. */
+  rating?: number;
+  /** USGA slope rating (55-155), if known. */
+  slope?: number;
 }
 
 export interface Putt {
