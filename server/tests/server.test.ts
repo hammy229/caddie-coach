@@ -44,7 +44,7 @@ afterAll(() => {
 });
 
 describe("MCP endpoint over Streamable HTTP", () => {
-  it("lists all nine tools with descriptions", async () => {
+  it("lists all ten tools with descriptions", async () => {
     const c = await connect("u0");
     const { tools } = await c.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
@@ -53,6 +53,7 @@ describe("MCP endpoint over Streamable HTTP", () => {
       "get_game_profile",
       "log_putt",
       "log_shot",
+      "plan_hole",
       "practice_plan",
       "recommend_club",
       "set_risk_tolerance",
@@ -105,6 +106,16 @@ describe("MCP endpoint over Streamable HTTP", () => {
     const sg = (res.structuredContent as { strokesGained: number }).strokesGained;
     expect(sg).toBeGreaterThan(0);
     expect(text(res)).toContain("in the hole");
+    await c.close();
+  });
+
+  it("plans a hole with a tee shot and an approach", async () => {
+    const c = await connect("u0");
+    const res = await c.callTool({ name: "plan_hole", arguments: { par: 4, hole_yards: 410 } });
+    const plan = (res.structuredContent as { plan: { shots: { club: string }[] } }).plan;
+    expect(plan.shots).toHaveLength(2);
+    expect(plan.shots[0]?.club).toBe("driver");
+    expect(text(res)).toContain("Par 4, 410 yards");
     await c.close();
   });
 
