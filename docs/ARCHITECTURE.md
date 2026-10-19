@@ -5,11 +5,11 @@
 | Component | Tech | Status |
 |---|---|---|
 | MCP server | TypeScript, `@modelcontextprotocol/sdk`, Express, Streamable HTTP, spec 2025-11-25 | Done |
-| Golf engine | `server/src/domain/`: dispersion model, caddie engine, pattern detector, swing analyzer, round report | Done, unit tested |
+| Golf engine | `server/src/domain/`: dispersion model, caddie engine, strokes-gained baselines, hole-strategy engine, practice-plan drills, handicap index, pattern detector, swing analyzer, round report | Done, unit tested |
 | Swing capture | `/capture` page, MediaPipe Pose Landmarker (lite) in the browser, uploads keypoints to `/api/swings` | Built, not yet tested on a real camera |
 | Per-user state | Amazon DynamoDB (`userId` partition key), in-memory store for local dev | Code done, table not deployed |
 | Round recap | Amazon Bedrock Converse API with template fallback | Code done, not yet run against Bedrock |
-| UI cards | MCP App resources `ui://caddie-coach/round-report`, `ui://caddie-coach/swing` | Done; conforms to MCP Apps SEP-1865 (ui:// URIs, `text/html;profile=mcp-app`, `_meta.ui.resourceUri` tool linkage, `ui/initialize` + `ui/notifications/tool-result` postMessage), not yet rendered on a live Alexa+ |
+| UI cards | MCP App resources `ui://caddie-coach/round-report`, `ui://caddie-coach/swing`, `ui://caddie-coach/practice` | Done; conforms to MCP Apps SEP-1865 (ui:// URIs, `text/html;profile=mcp-app`, `_meta.ui.resourceUri` tool linkage, `ui/initialize` + `ui/notifications/tool-result` postMessage), not yet rendered on a live Alexa+ |
 | Hosting | AWS Lambda (container image) behind an HTTPS Function URL, via the Lambda Web Adapter | SAM stack in `infra/`, deploy pending AWS account |
 | Auth | OAuth/OIDC (Amazon Cognito), `resource` = canonical server URI | Planned |
 | Alexa+ bridge | Alexa AI CLI add-on (`alexa-ai new mcp`, `alexa-ai deploy`) | Planned |
@@ -18,7 +18,7 @@
 
 1. The golfer speaks to Alexa+. Alexa+ routes the request through the add-on to `POST /mcp`.
 2. The server builds a request-scoped MCP server, runs the tool against the golfer's state, and saves changes.
-3. Alexa+ speaks the tool's text and, for `end_round` and `analyze_swing`, renders the linked card.
+3. Alexa+ speaks the tool's text and, for `end_round`, `analyze_swing` and `practice_plan`, renders the linked card.
 
 The server is stateless per request, so it fits Lambda or App Runner. All durable data is in the `StateStore`. The deployment path is a Lambda container image run by the [Lambda Web Adapter](https://github.com/awslabs/aws-lambda-web-adapter), exposed through a Function URL in `RESPONSE_STREAM` mode so the MCP SSE responses stream back. See `infra/` for the SAM stack and `infra/README.md` for deploy steps.
 
