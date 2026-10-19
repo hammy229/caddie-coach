@@ -1,5 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { bagModel } from "../domain/dispersion.js";
+import { handicapIndex, scoringAverage } from "../domain/handicap.js";
 import { FAULT_LABEL } from "../domain/patterns.js";
 import { strokesGained } from "../domain/strokesGained.js";
 import type { SwingFault } from "../domain/types.js";
@@ -48,6 +49,11 @@ export function registerGetGameProfile(server: McpServer, ctx: ToolContext): voi
       }
       parts.push(`${rounds} round${rounds === 1 ? "" : "s"} tracked, playing it ${state.risk}.`);
 
+      const handicap = handicapIndex(state.rounds);
+      const avgScore = scoringAverage(state.rounds);
+      if (handicap) parts.push(`Your handicap index is about ${handicap.index}, from ${handicap.roundsUsed} scored rounds.`);
+      else if (avgScore) parts.push(`You're averaging ${avgScore} over your scored rounds.`);
+
       const sg = strokesGained(state.shots, state.putts);
       if (sg.approachShots >= 5 || sg.putts >= 5) {
         const bits: string[] = [];
@@ -57,6 +63,8 @@ export function registerGetGameProfile(server: McpServer, ctx: ToolContext): voi
       }
 
       return result(parts.join(" "), {
+        handicapIndex: handicap?.index ?? null,
+        scoringAverage: avgScore,
         strokesGained: sg,
         clubs,
         faultCounts,
