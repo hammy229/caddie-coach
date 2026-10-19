@@ -84,7 +84,7 @@ npm run lint
 npm test
 ```
 
-36 tests: the dispersion model, caddie engine, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
+60 tests: the stats helpers, dispersion model, caddie engine, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
 
 ## Deploy to AWS
 
