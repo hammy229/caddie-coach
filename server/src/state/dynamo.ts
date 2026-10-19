@@ -20,7 +20,9 @@ export class DynamoStore implements StateStore {
     const res = await this.doc.send(
       new GetCommand({ TableName: this.tableName, Key: { userId } }),
     );
-    return (res.Item?.state as UserState | undefined) ?? emptyState();
+    const stored = res.Item?.state as Partial<UserState> | undefined;
+    // Merge defaults so records written before a field existed stay valid.
+    return stored ? { ...emptyState(), ...stored } : emptyState();
   }
 
   async save(userId: string, state: UserState): Promise<void> {

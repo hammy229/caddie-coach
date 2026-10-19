@@ -6,7 +6,7 @@ import { shot } from "./fixtures.js";
 const round: Round = { id: "r1", course: "Butler Park", date: "2026-10-17", risk: "normal", ended: true };
 
 function report(shots: UserState["shots"], r: Round = round) {
-  const state: UserState = { risk: "normal", activeRoundId: null, rounds: [r], swings: [], shots };
+  const state: UserState = { risk: "normal", activeRoundId: null, rounds: [r], putts: [], swings: [], shots };
   return buildRoundReport(state, r);
 }
 

@@ -12,6 +12,7 @@ function state(): UserState {
     risk: "normal",
     activeRoundId: null,
     rounds: [old, today],
+    putts: [],
     swings: [],
     shots: [
       // Earlier round: 1 of 4 fairways, 7i usually 150.

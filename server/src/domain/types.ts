@@ -34,6 +34,17 @@ export interface Round {
   strokes?: number;
 }
 
+export interface Putt {
+  id: string;
+  roundId: string | null;
+  /** Distance of the putt in feet. */
+  distanceFeet: number;
+  holed: boolean;
+  /** Distance left after the putt in feet; 0 when holed. */
+  remainingFeet: number;
+  date: string;
+}
+
 export type SwingFault = "over_the_top" | "early_extension" | "fast_tempo" | "slow_tempo";
 
 export interface SwingAnalysis {
@@ -54,6 +65,7 @@ export interface UserState {
   risk: Risk;
   rounds: Round[];
   shots: Shot[];
+  putts: Putt[];
   swings: SwingAnalysis[];
   activeRoundId: string | null;
 }
@@ -62,6 +74,7 @@ export const emptyState = (): UserState => ({
   risk: "normal",
   rounds: [],
   shots: [],
+  putts: [],
   swings: [],
   activeRoundId: null,
 });

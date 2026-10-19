@@ -4,7 +4,7 @@ import { buildRoundReport, templateRecap } from "../src/domain/report.js";
 import type { Round, UserState } from "../src/domain/types.js";
 
 const round: Round = { id: "r1", course: "Test", date: "2026-10-17", risk: "normal", ended: true };
-const state: UserState = { risk: "normal", activeRoundId: null, rounds: [round], swings: [], shots: [] };
+const state: UserState = { risk: "normal", activeRoundId: null, rounds: [round], putts: [], swings: [], shots: [] };
 const report = buildRoundReport(state, round);
 
 // Minimal Bedrock client stub: resolves whatever `send` returns.
