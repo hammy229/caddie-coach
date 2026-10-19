@@ -44,13 +44,14 @@ afterAll(() => {
 });
 
 describe("MCP endpoint over Streamable HTTP", () => {
-  it("lists all seven tools with descriptions", async () => {
+  it("lists all eight tools with descriptions", async () => {
     const c = await connect("u0");
     const { tools } = await c.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual([
       "analyze_swing",
       "end_round",
       "get_game_profile",
+      "log_putt",
       "log_shot",
       "recommend_club",
       "set_risk_tolerance",
@@ -93,6 +94,16 @@ describe("MCP endpoint over Streamable HTTP", () => {
     expect(s.playsLikeYards).toBe(165);
     expect(s.risk).toBe("aggressive");
     expect(text(rec)).toMatch(/^Hit /);
+    await c.close();
+  });
+
+  it("logs a holed putt and reports putting strokes gained", async () => {
+    const c = await connect("putter");
+    await c.callTool({ name: "start_round", arguments: { course: "Butler Park" } });
+    const res = await c.callTool({ name: "log_putt", arguments: { distance_feet: 20, holed: true } });
+    const sg = (res.structuredContent as { strokesGained: number }).strokesGained;
+    expect(sg).toBeGreaterThan(0);
+    expect(text(res)).toContain("in the hole");
     await c.close();
   });
 
