@@ -6,6 +6,7 @@ import { registerEndRound } from "./tools/endRound.js";
 import { registerGetGameProfile } from "./tools/getGameProfile.js";
 import { registerLogPutt } from "./tools/logPutt.js";
 import { registerLogShot } from "./tools/logShot.js";
+import { registerPlanHole } from "./tools/planHole.js";
 import { registerPracticePlan } from "./tools/practicePlan.js";
 import { registerRecommendClub } from "./tools/recommendClub.js";
 import { registerSetRiskTolerance } from "./tools/setRiskTolerance.js";
@@ -19,6 +20,7 @@ export function buildServer(ctx: ToolContext): McpServer {
   registerLogShot(server, ctx);
   registerLogPutt(server, ctx);
   registerRecommendClub(server, ctx);
+  registerPlanHole(server, ctx);
   registerAnalyzeSwing(server, ctx);
   registerEndRound(server, ctx);
   registerGetGameProfile(server, ctx);
