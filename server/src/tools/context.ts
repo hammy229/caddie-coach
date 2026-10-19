@@ -13,6 +13,7 @@ export interface ToolContext {
 
 export const ROUND_REPORT_UI_URI = "ui://caddie-coach/round-report";
 export const SWING_UI_URI = "ui://caddie-coach/swing";
+export const PRACTICE_UI_URI = "ui://caddie-coach/practice";
 
 export const clubSchema = z
   .enum(CLUBS)

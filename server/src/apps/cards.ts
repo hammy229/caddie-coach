@@ -76,6 +76,23 @@ export const ROUND_REPORT_HTML = page(
   }`,
 );
 
+export const PRACTICE_HTML = page(
+  "Practice plan",
+  "caddie-coach-practice",
+  `function render(data) {
+    var p = data.plan; if (!p) return;
+    root.className = ""; root.replaceChildren();
+    root.appendChild(el("h1", "", "Practice plan"));
+    root.appendChild(el("div", "sub", p.totalMinutes + " minutes · " + p.drills.length + " drills"));
+    if (p.drills.length === 0) { root.appendChild(el("p", "empty", "Log a few rounds and swings and I'll tailor this to your game.")); return; }
+    p.drills.forEach(function (d) {
+      root.appendChild(el("div", "label", d.name + " · " + d.minutes + " min"));
+      root.appendChild(el("p", "bad", d.why));
+      root.appendChild(el("p", "", d.how));
+    });
+  }`,
+);
+
 export const SWING_HTML = page(
   "Swing check",
   "caddie-coach-swing",
