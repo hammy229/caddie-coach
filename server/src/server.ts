@@ -4,6 +4,7 @@ import { registerAnalyzeSwing } from "./tools/analyzeSwing.js";
 import { ROUND_REPORT_UI_URI, SWING_UI_URI, type ToolContext } from "./tools/context.js";
 import { registerEndRound } from "./tools/endRound.js";
 import { registerGetGameProfile } from "./tools/getGameProfile.js";
+import { registerLogPutt } from "./tools/logPutt.js";
 import { registerLogShot } from "./tools/logShot.js";
 import { registerRecommendClub } from "./tools/recommendClub.js";
 import { registerSetRiskTolerance } from "./tools/setRiskTolerance.js";
@@ -15,6 +16,7 @@ export function buildServer(ctx: ToolContext): McpServer {
   registerStartRound(server, ctx);
   registerSetRiskTolerance(server, ctx);
   registerLogShot(server, ctx);
+  registerLogPutt(server, ctx);
   registerRecommendClub(server, ctx);
   registerAnalyzeSwing(server, ctx);
   registerEndRound(server, ctx);
