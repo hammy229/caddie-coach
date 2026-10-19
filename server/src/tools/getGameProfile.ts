@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { bagModel } from "../domain/dispersion.js";
 import { FAULT_LABEL } from "../domain/patterns.js";
+import { strokesGained } from "../domain/strokesGained.js";
 import type { SwingFault } from "../domain/types.js";
 import { result, type ToolContext } from "./context.js";
 
@@ -47,7 +48,16 @@ export function registerGetGameProfile(server: McpServer, ctx: ToolContext): voi
       }
       parts.push(`${rounds} round${rounds === 1 ? "" : "s"} tracked, playing it ${state.risk}.`);
 
+      const sg = strokesGained(state.shots, state.putts);
+      if (sg.approachShots >= 5 || sg.putts >= 5) {
+        const bits: string[] = [];
+        if (sg.approachShots >= 5) bits.push(`approaches ${sg.approach >= 0 ? "+" : ""}${sg.approach}`);
+        if (sg.putts >= 5) bits.push(`putting ${sg.putting >= 0 ? "+" : ""}${sg.putting}`);
+        parts.push(`Career strokes gained versus the benchmark: ${bits.join(", ")}.`);
+      }
+
       return result(parts.join(" "), {
+        strokesGained: sg,
         clubs,
         faultCounts,
         swingsRecorded: state.swings.length,
