@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BedrockNarrator } from "../src/domain/narrator.js";
 import { buildRoundReport, templateRecap } from "../src/domain/report.js";
-import type { Round, UserState } from "../src/domain/types.js";
+import type { Putt, Round, UserState } from "../src/domain/types.js";
 import { shot } from "./fixtures.js";
 
 const old: Round = { id: "old", course: "Lions", date: "2026-10-01", risk: "normal", ended: true };
@@ -57,6 +57,23 @@ describe("buildRoundReport", () => {
     const text = templateRecap(r);
     expect(text).toContain("you shot 84");
     expect(text).toContain("3 of 4 fairways");
+  });
+});
+
+describe("putting in the round report", () => {
+  const putt = (distanceFeet: number, holed: boolean, remainingFeet = 0): Putt => ({
+    id: `p${distanceFeet}`, roundId: "r1", distanceFeet, holed, remainingFeet, date: "2026-10-14",
+  });
+
+  it("counts putts and surfaces positive putting strokes gained", () => {
+    const s = state();
+    s.putts = [putt(25, true), putt(18, true), putt(30, true)];
+    const r = buildRoundReport(s, today);
+    expect(r.putts).toBe(3);
+    expect(r.puttsHoled).toBe(3);
+    expect(r.strokesGained.putting).toBeGreaterThan(0);
+    expect(r.strengths.join(" ")).toContain("strokes gained on the greens");
+    expect(templateRecap(r)).toContain("versus the benchmark");
   });
 });
 

@@ -1,4 +1,5 @@
 import { mean, round1 } from "./stats.js";
+import { strokesGained } from "./strokesGained.js";
 import type { Club, Round, Shot, SwingFault, UserState } from "./types.js";
 
 export interface ClubTrend {
@@ -24,6 +25,10 @@ export interface RoundReport {
   dominantMiss: "short" | "long" | "left" | "right" | null;
   clubTrends: ClubTrend[];
   swingFaults: SwingFault[];
+  /** Strokes gained versus the tour benchmark, from logged approaches and putts. */
+  strokesGained: { approach: number; putting: number; total: number };
+  putts: number;
+  puttsHoled: number;
   vsPrior: {
     rounds: number;
     fairwayPct: number | null;
@@ -58,6 +63,8 @@ function rates(shots: Shot[]) {
 
 export function buildRoundReport(state: UserState, round: Round): RoundReport {
   const shots = state.shots.filter((s) => s.roundId === round.id);
+  const roundPutts = state.putts.filter((p) => p.roundId === round.id);
+  const sg = strokesGained(shots, roundPutts);
   const prior = state.rounds.filter((r) => r.id !== round.id && r.ended && r.date <= round.date);
   const priorShots = state.shots.filter((s) => s.roundId && prior.some((r) => r.id === s.roundId));
 
@@ -108,6 +115,14 @@ export function buildRoundReport(state: UserState, round: Round): RoundReport {
     if (greenPct >= 50) strengths.push(`Approaches: ${greenPct}% finished within ${GREEN_RADIUS} yards.`);
     else weaknesses.push(`Approaches: ${greenPct}% finished within ${GREEN_RADIUS} yards.`);
   }
+  if (sg.approachShots >= 3) {
+    if (sg.approach >= 0.5) strengths.push(`Approaches: +${sg.approach} strokes gained versus the benchmark.`);
+    else if (sg.approach <= -0.5) weaknesses.push(`Approaches: ${sg.approach} strokes versus the benchmark.`);
+  }
+  if (sg.putts >= 3) {
+    if (sg.putting >= 0.5) strengths.push(`Putting: +${sg.putting} strokes gained on the greens.`);
+    else if (sg.putting <= -0.5) weaknesses.push(`Putting: ${sg.putting} strokes on the greens.`);
+  }
   if (dominantMiss) weaknesses.push(`Your typical miss today was ${dominantMiss}.`);
   for (const t of clubTrends) {
     if (t.usualCarry && t.todayCarry < t.usualCarry * 0.93) {
@@ -136,6 +151,9 @@ export function buildRoundReport(state: UserState, round: Round): RoundReport {
     dominantMiss,
     clubTrends,
     swingFaults,
+    strokesGained: { approach: sg.approach, putting: sg.putting, total: sg.total },
+    putts: roundPutts.length,
+    puttsHoled: roundPutts.filter((p) => p.holed).length,
     vsPrior: { rounds: prior.length, fairwayPct, greenPct, priorFairwayPct, priorGreenPct },
     strengths,
     weaknesses,
@@ -147,6 +165,7 @@ export function templateRecap(r: RoundReport): string {
   const parts = [`Round at ${r.course}${r.strokes ? `, you shot ${r.strokes}` : ""}.`];
   if (r.teeShots) parts.push(`You hit ${r.fairwaysHit} of ${r.teeShots} fairways.`);
   if (r.approaches) parts.push(`${r.greensHit} of ${r.approaches} approaches finished close.`);
+  if (r.putts >= 3) parts.push(`You putted ${r.strokesGained.putting >= 0 ? "+" : ""}${r.strokesGained.putting} strokes versus the benchmark.`);
   if (r.strengths[0]) parts.push(`Best part: ${r.strengths[0]}`);
   if (r.weaknesses[0]) parts.push(`Work on: ${r.weaknesses[0]}`);
   return parts.join(" ");
