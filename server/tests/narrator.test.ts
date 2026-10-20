@@ -17,7 +17,7 @@ describe("createNarrator", () => {
   });
 
   it("uses Bedrock when a model id is set", () => {
-    expect(createNarrator({ BEDROCK_MODEL_ID: "anthropic.claude" })).toBeInstanceOf(BedrockNarrator);
+    expect(createNarrator({ BEDROCK_MODEL_ID: "us.amazon.nova-micro-v1:0" })).toBeInstanceOf(BedrockNarrator);
   });
 });
 

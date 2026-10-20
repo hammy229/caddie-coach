@@ -28,7 +28,7 @@ sam build            # builds server/Dockerfile for arm64
 sam deploy           # uses samconfig.toml; confirms the changeset
 
 # With Bedrock recaps (request model access first in the Bedrock console):
-sam deploy --parameter-overrides BedrockModelId=us.anthropic.claude-3-5-haiku-20241022-v1:0
+sam deploy --parameter-overrides BedrockModelId=us.amazon.nova-micro-v1:0
 ```
 
 `sam deploy` prints two outputs:

@@ -9,7 +9,7 @@ Parameters:
     Type: String
     Default: ""
     Description: >
-      Bedrock model ID for the spoken round recap (e.g. us.anthropic.claude-3-5-haiku-20241022-v1:0).
+      Bedrock model ID for the spoken round recap (e.g. us.amazon.nova-micro-v1:0).
       Leave empty to use the built-in templated recap and skip Bedrock entirely.
 
   OAuthSigningSecret:
