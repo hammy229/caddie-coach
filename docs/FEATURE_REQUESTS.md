@@ -6,6 +6,7 @@ Template: description, why it matters, priority (Critical / Important / Nice-to-
 - **Description:** A minimal, runnable auth server that passes the Alexa+ MCP account-linking checklist (bare 401, RFC 9728 metadata, RFC 8414 metadata with `S256`), or a step-by-step Cognito configuration that does.
 - **Why it matters:** Account linking is the step most likely to block an add-on, and the docs list requirements without a working example. This project had to write and test its own (`server/src/auth/oauth.ts`).
 - **Priority:** Critical
+- **What I did meanwhile:** published one: [alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth).
 
 ### FR-2: Which MCP Apps features Alexa+ renders
 - **Description:** A support matrix for MCP Apps on Alexa+ devices: which `ui://` cards render on which Echo Show sizes, and which postMessage notifications (`ui/notifications/tool-result`, `ui/notifications/tool-input`) the host sends.

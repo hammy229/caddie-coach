@@ -30,7 +30,7 @@ The rules do **not** require a live cloud deploy: judges test via the repo and t
    - **Blocker found:** the `alexa-ai` CLI installs from Amazon's private registry by assuming an Amazon-owned role, and that role does not trust this AWS account (`AccessDenied` on `sts:AssumeRole`). Access is granted by Amazon (the docs tie it to an Alexa Solutions Architect). Ask in the hackathon Discord or Devpost discussions, giving AWS account ID `232547853220`.
    - **Ready fallback:** the simulated Alexa+ host at `/alexa` (the rules' alternate path), already built and tested end to end.
 2. [ ] **Record the demo video** (under 3:00, English, public on YouTube or Vimeo, no third-party trademarks or copyrighted music). Follow `docs/DEMO_SCRIPT.md`; pre-seed one scored round. It must show the project working on Alexa+.
-3. [ ] **Open Source mini challenge** ($5,000). Needs a **separate** new open-source repo, or a fork/branch/PR to an existing public repo, made during the hackathon. Fill the contribution fields in the writeup.
+3. [x] **Open Source mini challenge** ($5,000): [hammy229/alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth), public, MIT (detected by GitHub), CI green, 39 tests. Fields filled in `docs/DEVPOST_SUBMISSION.md`.
 4. [ ] **Submit on Devpost.** Paste from `docs/DEVPOST_SUBMISSION.md`; add the video, repo and Open Source links; pick Alexa+ as the track and both mini challenges.
 5. [ ] *(Optional, bonus)* **Live AWS deploy.** Blocked by the new account's free-plan service control policy (friction log F-3); upgrade the plan, then `cd infra && sam deploy`. Not needed for AWS Builder eligibility, which asks for documented integrations, but a live endpoint is stronger evidence.
 
