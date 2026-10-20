@@ -49,6 +49,7 @@ Each section covers: what it was used for, what worked well, what needs work, on
 - **Used for:** The spoken post-round recap, through the Converse API (`server/src/domain/narrator.ts`). The prompt constrains the model to the round report's facts, and any failure falls back to a deterministic template so a recap is always spoken.
 - **Worked well:** Converse gives one request shape across model families, so the model is a single environment variable (`BEDROCK_MODEL_ID`) and can be swapped without code changes. `list-foundation-models` worked from the CLI immediately.
 - **Needs work:** On a new account every invoke failed with "Your account is currently being verified" while the read-only APIs succeeded, so the block was invisible until the first call (F-4).
+- **Live result:** After verification, Amazon Nova Micro (`us.amazon.nova-micro-v1:0`) wrote the recap in about a second. One lesson: on a golfer's first round the report carried an empty `vsPrior` block, and the model invented a comparison with "earlier rounds". The prompt now drops that block and says not to compare (`recapPrompt` in `narrator.ts`, with tests). Small models need absent data removed, not just marked null.
 - **Onboarding (zero → hello world):** The SDK call is a few lines; account readiness, not code, was the wait.
 - **Build again?** Yes — the template fallback plus Converse makes generative output safe to put in a voice flow.
 

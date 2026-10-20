@@ -46,7 +46,7 @@ Platform and tooling friction hit while building. Newest last.
 - **Expected:** A completion, or a model-access error.
 - **Actual:** `AccessDeniedException: Your account is currently being verified. Verification normally takes less than 2 hours.` `bedrock list-foundation-models` worked in the same session, which made it look like Bedrock was ready.
 - **Severity:** Medium (time-boxed, but invisible until the first invoke).
-- **Workaround:** The narrator already falls back to a deterministic template recap, so the product keeps working; retried after verification.
+- **Workaround:** The narrator already falls back to a deterministic template recap, so the product kept working. Verification finished the same day and the live Converse recap then worked.
 - **Suggestion:** Show account-verification status on the console home and in the Bedrock console, and return the same message from the read-only Bedrock APIs so it surfaces before the first invoke.
 
 ### F-5: `aws configure` and `aws login` cannot run from an agent or non-interactive shell
