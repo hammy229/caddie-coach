@@ -19,7 +19,7 @@ Alexa+ caddie that builds a model of how *you* actually hit each club, picks the
 
 ## Tracks & challenges entered
 
-- **Primary track: Alexa+.** A self-hosted MCP server implementing spec **2025-11-25** over Streamable HTTP, with the MCP SDK imported and called at runtime (`server/src/server.ts`, `server/src/index.ts`). It keeps state across sessions and returns MCP Apps cards, two of the "creative" signals the rules call out.
+- **Primary track: Alexa+.** A self-hosted MCP server implementing spec **2025-11-25** over Streamable HTTP, with the MCP SDK imported and called at runtime (`server/src/server.ts`, `server/src/index.ts`). It keeps state across sessions and returns MCP Apps cards, two of the "creative" signals the rules call out. The demo runs on a simulated Alexa+ host (`/alexa`, the rules' alternate path) that speaks to the same real MCP server; _replace this sentence if the add-on goes live on a device._
 - **Mini challenge: AWS Builder.** A multi-service integration, documented in `infra/`, `docs/ARCHITECTURE.md` and the Product Feedback below: AWS Lambda (container image + Lambda Web Adapter) behind a Function URL with response streaming, Amazon DynamoDB for per-golfer state, Amazon Bedrock (Converse) for the spoken recap, Amazon ECR and least-privilege IAM, all in one SAM stack.
 - **Mini challenge: Open Source.** _Fill in once the separate contribution exists (see below)._ The rules require a new, additional open-source project or a contribution to an existing public repo; this repo alone does not count.
 
@@ -49,7 +49,7 @@ Ten tools, three interactive cards, one running model of your game.
 ## How we built it
 
 - **Alexa+ add-on → MCP server.** The add-on connects to a remote **Model Context Protocol** server (Streamable HTTP, spec 2025-11-25) exposing ten tools. Alexa+ handles the language; the server owns the golf reasoning, so the intelligence is testable and portable.
-- **Domain engine, no framework magic.** Each capability is a pure TypeScript module — dispersion model, caddie engine, strokes gained, hole strategy, practice-plan scorer, handicap, pattern detector, swing analyzer — with a thin tool wrapper on top. That kept it unit-testable: **114 tests**, including end-to-end contract tests that drive the real HTTP server with the MCP SDK client and walk the full OAuth flow.
+- **Domain engine, no framework magic.** Each capability is a pure TypeScript module — dispersion model, caddie engine, strokes gained, hole strategy, practice-plan scorer, handicap, pattern detector, swing analyzer — with a thin tool wrapper on top. That kept it unit-testable: **136 tests**, including end-to-end contract tests that drive the real HTTP server with the MCP SDK client and walk the full OAuth flow.
 - **Pose in the browser.** The `/capture` page runs MediaPipe Pose client-side and posts only six keypoints per frame to `/api/swings`. No video is stored or transmitted.
 - **AWS.** The server ships as a **container image** on **AWS Lambda** with the **Lambda Web Adapter**, behind an HTTPS **Function URL** (response streaming). State lives in **DynamoDB** (on-demand, single `userId` key). The spoken post-round recap is written by **Amazon Bedrock** (Converse), with a deterministic template fallback when it is not configured. The whole stack is one `sam deploy`.
 - **MCP Apps.** Three tools return interactive HTML cards (round report, swing check, practice plan) following the MCP Apps spec — `ui://` resources, the `text/html;profile=mcp-app` content type, and the `ui/*` postMessage handshake.
@@ -67,7 +67,7 @@ Ten tools, three interactive cards, one running model of your game.
 - Patterns surfaced *mid-round, unprompted*, the way a human caddie would.
 - Private-by-design swing coaching: pose stays in the browser, only keypoints leave the phone.
 - Strokes gained and a real WHS handicap index, not vanity stats.
-- A clean, fully tested codebase (114 tests, green CI) that deploys to AWS with a single command.
+- A clean, fully tested codebase (136 tests, green CI) that deploys to AWS with a single command.
 
 ## What we learned
 
@@ -94,13 +94,15 @@ Requires Node 22+. No AWS account or credentials are needed to run it.
 
 ```bash
 git clone https://github.com/hammy229/caddie-coach && cd caddie-coach/server
-npm install && npm test        # 114 tests
+npm install && npm test        # 136 tests
 npm run dev                    # http://localhost:3000/mcp
 npx @modelcontextprotocol/inspector
 # Transport: Streamable HTTP, URL http://localhost:3000/mcp, header x-user-id: demo-user
 ```
 
-Try `start_round`, then `log_shot` three times with `distance_miss_yards: -10` to see a pattern raised unprompted, then `recommend_club`, `plan_hole`, `end_round` and `practice_plan`. The swing capture page is at `http://localhost:3000/capture`. Without `OAUTH_SIGNING_SECRET` the server runs in development mode and takes the user from `x-user-id`; with it, `/mcp` requires an OAuth bearer token (see `README.md`).
+Easiest: open http://localhost:3000/alexa in Chrome, click **Load an earlier round**, then click the demo requests in order (or use the mic). Each one is a real MCP call shown in the traffic panel.
+
+Or with the Inspector: try `start_round`, then `log_shot` three times with `distance_miss_yards: -10` to see a pattern raised unprompted, then `recommend_club`, `plan_hole`, `end_round` and `practice_plan`. The swing capture page is at `http://localhost:3000/capture`. Without `OAUTH_SIGNING_SECRET` the server runs in development mode and takes the user from `x-user-id`; with it, `/mcp` requires an OAuth bearer token (see `README.md`).
 
 ## Product Feedback
 
