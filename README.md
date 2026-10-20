@@ -117,6 +117,8 @@ Alexa+ needs a remote HTTPS Streamable HTTP endpoint (the Function URL above) an
 Working: all ten tools, personal model, pattern detection, swing analysis, strokes gained, course strategy, practice plans, handicap index, round report, all three cards, capture page, contract tests, and the SAM deploy stack (Lambda + Function URL + DynamoDB + Bedrock).
 In progress: running the stack in a live AWS account, OAuth/OIDC, Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
 
+See [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) for what's done and what's left, and [docs/DEVPOST_SUBMISSION.md](docs/DEVPOST_SUBMISSION.md) for the submission writeup.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
