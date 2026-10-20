@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { recommendClub } from "../domain/recommend.js";
+import { clubName } from "../domain/types.js";
 import { result, riskSchema, type ToolContext } from "./context.js";
 
 export function registerRecommendClub(server: McpServer, ctx: ToolContext): void {
@@ -41,7 +42,7 @@ export function registerRecommendClub(server: McpServer, ctx: ToolContext): void
         rec.aimYards === 0
           ? "Aim right at it."
           : `Aim ${Math.abs(rec.aimYards)} yards ${rec.aimYards < 0 ? "left" : "right"} of the target.`;
-      const text = `Hit ${rec.club}. ${aim} ${rec.reasons.join(" ")}`;
+      const text = `Hit ${clubName(rec.club)}. ${aim} ${rec.reasons.join(" ")}`;
       return result(text, { ...rec, risk });
     },
   );

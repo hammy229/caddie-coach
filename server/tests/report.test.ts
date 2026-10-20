@@ -50,7 +50,7 @@ describe("buildRoundReport", () => {
     expect(r.vsPrior.priorFairwayPct).toBe(25);
     expect(r.vsPrior.fairwayPct).toBe(75);
     expect(r.strengths.join(" ")).toContain("Fairways up from 25%");
-    expect(r.weaknesses.join(" ")).toContain("7i carried 14 yards shorter than usual");
+    expect(r.weaknesses.join(" ")).toContain("7 iron carried 14 yards shorter than usual");
   });
 
   it("produces a spoken template recap", () => {

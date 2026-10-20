@@ -1,6 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { detectShotPatterns } from "../domain/patterns.js";
+import { clubName } from "../domain/types.js";
 import { clubSchema, nextId, result, type ToolContext } from "./context.js";
 
 export function registerLogShot(server: McpServer, ctx: ToolContext): void {
@@ -50,7 +51,7 @@ export function registerLogShot(server: McpServer, ctx: ToolContext): void {
       const miss = carry - target_yards;
       const depth = miss === 0 ? "pin high" : `${Math.abs(miss)} ${miss < 0 ? "short" : "long"}`;
       const side = lateral_miss_yards === 0 ? "" : `, ${Math.abs(lateral_miss_yards)} ${lateral_miss_yards < 0 ? "left" : "right"}`;
-      const text = [`Got it: ${club}, ${depth}${side}.`, ...insights.map((i) => i.message)].join(" ");
+      const text = [`Got it: ${clubName(club)}, ${depth}${side}.`, ...insights.map((i) => i.message)].join(" ");
       return result(text, { shot, insights, roundActive: Boolean(active) });
     },
   );

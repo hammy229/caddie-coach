@@ -3,6 +3,15 @@ export const CLUBS = [
 ] as const;
 export type Club = (typeof CLUBS)[number];
 
+const CLUB_NAMES: Record<Club, string> = {
+  driver: "driver", "3w": "3 wood", "5w": "5 wood", hybrid: "hybrid", "4i": "4 iron", "5i": "5 iron",
+  "6i": "6 iron", "7i": "7 iron", "8i": "8 iron", "9i": "9 iron", pw: "pitching wedge", gw: "gap wedge",
+  sw: "sand wedge", lw: "lob wedge",
+};
+
+/** How a club is said out loud ("7 iron", not "7i"). Structured data keeps the short code. */
+export const clubName = (club: Club): string => CLUB_NAMES[club];
+
 /** Typical amateur carry distances (yards), used until a player has logged enough shots. */
 export const DEFAULT_CARRY: Record<Club, number> = {
   driver: 230, "3w": 210, "5w": 195, hybrid: 185, "4i": 175, "5i": 165, "6i": 155,

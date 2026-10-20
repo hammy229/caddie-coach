@@ -3,7 +3,7 @@ import { bagModel } from "../domain/dispersion.js";
 import { handicapIndex, scoringAverage } from "../domain/handicap.js";
 import { FAULT_LABEL } from "../domain/patterns.js";
 import { strokesGained } from "../domain/strokesGained.js";
-import type { SwingFault } from "../domain/types.js";
+import { clubName, type SwingFault } from "../domain/types.js";
 import { result, type ToolContext } from "./context.js";
 
 export function registerGetGameProfile(server: McpServer, ctx: ToolContext): void {
@@ -40,7 +40,7 @@ export function registerGetGameProfile(server: McpServer, ctx: ToolContext): voi
       } else {
         parts.push(
           "Your real carries: " +
-            clubs.map((c) => `${c.club} ${c.carry}${c.lateralBias ? ` (misses ${Math.abs(c.lateralBias)} ${c.lateralBias > 0 ? "right" : "left"})` : ""}`).join(", ") +
+            clubs.map((c) => `${clubName(c.club)} ${c.carry}${c.lateralBias ? ` (misses ${Math.abs(c.lateralBias)} ${c.lateralBias > 0 ? "right" : "left"})` : ""}`).join(", ") +
             ".",
         );
       }

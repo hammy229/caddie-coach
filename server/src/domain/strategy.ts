@@ -1,6 +1,6 @@
 import { bagModel, type ClubModel } from "./dispersion.js";
 import { recommendClub, type Trouble } from "./recommend.js";
-import type { Club, Risk, Shot } from "./types.js";
+import { clubName, type Club, type Risk, type Shot } from "./types.js";
 
 /**
  * Plans a hole the way a caddie would: work backwards from a comfortable approach
@@ -72,7 +72,7 @@ export function planHole(shots: Shot[], c: HoleConditions, risk: Risk): HolePlan
         ? `lay back short of the hazard`
         : tee.club === "driver"
           ? "let the driver go"
-          : `${tee.club} to leave a full swing in`;
+          : `${clubName(tee.club)} to leave a full swing in`;
     plan.push({ number: 1, club: tee.club, targetYards: Math.round(tee.meanCarry), note: teeNote });
     plan.push(approachShot(shots, 2, remaining, risk, trouble));
   } else {
@@ -92,7 +92,7 @@ export function planHole(shots: Shot[], c: HoleConditions, risk: Risk): HolePlan
   }
 
   const summary = plan
-    .map((s) => `${s.number === 1 ? "Off the tee" : s.number === plan.length ? "Then" : "Next"}, ${s.club} (${s.note}).`)
+    .map((s) => `${s.number === 1 ? "Off the tee" : s.number === plan.length ? "Then" : "Next"}, ${clubName(s.club)} (${s.note}).`)
     .join(" ");
   return { par: c.par, holeYards: c.holeYards, shots: plan, summary };
 }

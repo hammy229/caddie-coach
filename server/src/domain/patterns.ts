@@ -1,6 +1,6 @@
 import { clubModel } from "./dispersion.js";
 import { mean } from "./stats.js";
-import type { Shot, SwingAnalysis, SwingFault } from "./types.js";
+import { clubName, type Shot, type SwingAnalysis, type SwingFault } from "./types.js";
 
 export interface Insight {
   kind:
@@ -77,7 +77,7 @@ export function detectShotPatterns(roundShots: Shot[], history: Shot[]): Insight
       if (drop >= 0.08) {
         insights.push({
           kind: "distance_drop",
-          message: `Your ${last.club} is going about ${Math.round(drop * 100)}% shorter than usual today. Club up with it for the rest of the round.`,
+          message: `Your ${clubName(last.club)} is going about ${Math.round(drop * 100)}% shorter than usual today. Club up with it for the rest of the round.`,
         });
       }
     }

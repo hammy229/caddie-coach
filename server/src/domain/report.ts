@@ -1,6 +1,6 @@
 import { mean, round1 } from "./stats.js";
 import { strokesGained } from "./strokesGained.js";
-import type { Club, Round, Shot, SwingFault, UserState } from "./types.js";
+import { clubName, type Club, type Round, type Shot, type SwingFault, type UserState } from "./types.js";
 
 export interface ClubTrend {
   club: Club;
@@ -126,7 +126,7 @@ export function buildRoundReport(state: UserState, round: Round): RoundReport {
   if (dominantMiss) weaknesses.push(`Your typical miss today was ${dominantMiss}.`);
   for (const t of clubTrends) {
     if (t.usualCarry && t.todayCarry < t.usualCarry * 0.93) {
-      weaknesses.push(`${t.club} carried ${t.usualCarry - t.todayCarry} yards shorter than usual.`);
+      weaknesses.push(`${clubName(t.club)} carried ${t.usualCarry - t.todayCarry} yards shorter than usual.`);
     }
   }
   if (fairwayPct !== null && priorFairwayPct !== null && fairwayPct > priorFairwayPct) {
