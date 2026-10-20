@@ -66,8 +66,9 @@ sam deploy --parameter-overrides \
 ```
 
 Keep the two secrets: the add-on needs the client id (`alexa-plus` by default) and the client
-secret. Leaving `OAuthSigningSecret` empty runs without OAuth, where `/mcp` trusts the
-`x-user-id` header. That is for local testing only. Reusing the same signing secret on later
+secret. Leaving `OAuthSigningSecret` empty makes the function refuse to start: without OAuth,
+`/mcp` would trust the `x-user-id` header and anyone could act as any golfer. For a throwaway
+test deploy only, add `ALLOW_INSECURE_DEV_AUTH=1` to the function's environment. Reusing the same signing secret on later
 deploys keeps linked golfers working; a new one invalidates every issued token and changes every
 golfer's id.
 

@@ -22,6 +22,21 @@ export interface AppDeps {
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 /**
+ * Without OAuth, /mcp trusts the `x-user-id` header, so anyone who can reach the server can act as
+ * any golfer. That is fine on localhost and fatal on a public URL, so refuse to start without OAuth
+ * on Lambda or in production unless explicitly overridden.
+ */
+export function assertSafeAuth(oauth: OAuthConfig | undefined, env: NodeJS.ProcessEnv): void {
+  const deployed = Boolean(env.AWS_LAMBDA_FUNCTION_NAME) || env.NODE_ENV === "production";
+  if (deployed && !oauth && env.ALLOW_INSECURE_DEV_AUTH !== "1") {
+    throw new Error(
+      "Refusing to start without OAuth: set OAUTH_SIGNING_SECRET and OAUTH_CLIENT_SECRET " +
+        "(or ALLOW_INSECURE_DEV_AUTH=1 for a throwaway test deploy).",
+    );
+  }
+}
+
+/**
  * Streamable HTTP MCP endpoint (spec 2025-11-25) plus the swing capture page.
  * Each MCP request gets a fresh server + transport; durable state lives in the StateStore.
  *
@@ -94,6 +109,7 @@ export function createApp(deps: AppDeps): Express {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.PORT ?? 3000);
   const oauth = oauthConfigFromEnv();
+  assertSafeAuth(oauth, process.env);
   createApp({ store: createStore(), narrator: createNarrator(), oauth }).listen(port, () => {
     console.log(`Caddie Coach MCP server: http://localhost:${port}/mcp`);
     console.log(`Swing capture page:     http://localhost:${port}/capture`);

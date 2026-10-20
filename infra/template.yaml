@@ -17,8 +17,8 @@ Parameters:
     NoEcho: true
     Default: ""
     Description: >
-      Secret used to sign OAuth codes and tokens (32+ random characters). Leave empty to run
-      without OAuth: /mcp then trusts the x-user-id header, for local testing only.
+      Secret used to sign OAuth codes and tokens (32+ random characters). Required: without it the
+      function refuses to start, because /mcp would trust the x-user-id header.
   OAuthClientId:
     Type: String
     Default: alexa-plus

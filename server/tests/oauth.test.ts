@@ -6,7 +6,7 @@ import type { AddressInfo } from "node:net";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { type OAuthConfig, oauthConfigFromEnv } from "../src/auth/oauth.js";
 import { TemplateNarrator } from "../src/domain/narrator.js";
-import { createApp } from "../src/index.js";
+import { assertSafeAuth, createApp } from "../src/index.js";
 import { MemoryStore } from "../src/state/store.js";
 import { syntheticSwing } from "./fixtures.js";
 
@@ -252,5 +252,21 @@ describe("config", () => {
     expect(c.redirectUris).toEqual(["https://a.example/cb", "https://b.example/cb"]);
     expect(c.baseUrl).toBe("https://x.example");
     expect(c.clientId).toBe("alexa-plus");
+  });
+});
+
+describe("assertSafeAuth", () => {
+  it("allows local development without OAuth", () => {
+    expect(() => assertSafeAuth(undefined, {})).not.toThrow();
+  });
+
+  it("refuses to run without OAuth on Lambda or in production", () => {
+    expect(() => assertSafeAuth(undefined, { AWS_LAMBDA_FUNCTION_NAME: "caddie" })).toThrow(/Refusing to start/);
+    expect(() => assertSafeAuth(undefined, { NODE_ENV: "production" })).toThrow(/Refusing to start/);
+  });
+
+  it("allows deploys with OAuth, or with the explicit override", () => {
+    expect(() => assertSafeAuth(cfg, { AWS_LAMBDA_FUNCTION_NAME: "caddie" })).not.toThrow();
+    expect(() => assertSafeAuth(undefined, { NODE_ENV: "production", ALLOW_INSECURE_DEV_AUTH: "1" })).not.toThrow();
   });
 });
