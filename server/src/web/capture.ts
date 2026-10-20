@@ -42,6 +42,14 @@ const params = new URLSearchParams(location.search);
 const userId = params.get("user") || localStorage.getItem("caddie-user") || "demo-user";
 try { localStorage.setItem("caddie-user", userId); } catch {}
 
+function golferHeaders() {
+  try {
+    const name = localStorage.getItem("caddie-name");
+    const pin = sessionStorage.getItem("caddie-pin");
+    return name && pin ? { "x-golfer-name": name, "x-golfer-pin": pin } : {};
+  } catch { return {}; }
+}
+
 const video = document.getElementById("video");
 const canvas = document.getElementById("overlay");
 const ctx = canvas.getContext("2d");
@@ -105,11 +113,22 @@ async function finish() {
   recording = false;
   button.textContent = "Uploading…";
   try {
-    const res = await fetch("/api/swings", {
+    const payload = JSON.stringify({ frames, handed: document.getElementById("handed").value, club: document.getElementById("club").value || undefined });
+    const send = () => fetch("/api/swings", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-user-id": userId },
-      body: JSON.stringify({ frames, handed: document.getElementById("handed").value, club: document.getElementById("club").value || undefined }),
+      headers: { "Content-Type": "application/json", "x-user-id": userId, ...golferHeaders() },
+      body: payload,
     });
+    let res = await send();
+    if (res.status === 401) {
+      // The server uses account linking: ask for the name and PIN chosen when linking Alexa.
+      const name = prompt("Your name, as entered when linking Alexa:", localStorage.getItem("caddie-name") || "");
+      const pin = name ? prompt("Your PIN:") : null;
+      if (name && pin) {
+        try { localStorage.setItem("caddie-name", name); sessionStorage.setItem("caddie-pin", pin); } catch {}
+        res = await send();
+      }
+    }
     const body = await res.json();
     if (!res.ok) throw new Error(body.error || res.statusText);
     say("Saved. Ask Alexa: \\"how was that swing?\\"");
