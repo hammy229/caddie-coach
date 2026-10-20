@@ -49,7 +49,7 @@ Ten tools, three interactive cards, one running model of your game.
 ## How we built it
 
 - **Alexa+ add-on → MCP server.** The add-on connects to a remote **Model Context Protocol** server (Streamable HTTP, spec 2025-11-25) exposing ten tools. Alexa+ handles the language; the server owns the golf reasoning, so the intelligence is testable and portable.
-- **Domain engine, no framework magic.** Each capability is a pure TypeScript module — dispersion model, caddie engine, strokes gained, hole strategy, practice-plan scorer, handicap, pattern detector, swing analyzer — with a thin tool wrapper on top. That kept it unit-testable: **93 tests**, including end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
+- **Domain engine, no framework magic.** Each capability is a pure TypeScript module — dispersion model, caddie engine, strokes gained, hole strategy, practice-plan scorer, handicap, pattern detector, swing analyzer — with a thin tool wrapper on top. That kept it unit-testable: **114 tests**, including end-to-end contract tests that drive the real HTTP server with the MCP SDK client and walk the full OAuth flow.
 - **Pose in the browser.** The `/capture` page runs MediaPipe Pose client-side and posts only six keypoints per frame to `/api/swings`. No video is stored or transmitted.
 - **AWS.** The server ships as a **container image** on **AWS Lambda** with the **Lambda Web Adapter**, behind an HTTPS **Function URL** (response streaming). State lives in **DynamoDB** (on-demand, single `userId` key). The spoken post-round recap is written by **Amazon Bedrock** (Converse), with a deterministic template fallback when it is not configured. The whole stack is one `sam deploy`.
 - **MCP Apps.** Three tools return interactive HTML cards (round report, swing check, practice plan) following the MCP Apps spec — `ui://` resources, the `text/html;profile=mcp-app` content type, and the `ui/*` postMessage handshake.
@@ -67,7 +67,7 @@ Ten tools, three interactive cards, one running model of your game.
 - Patterns surfaced *mid-round, unprompted*, the way a human caddie would.
 - Private-by-design swing coaching: pose stays in the browser, only keypoints leave the phone.
 - Strokes gained and a real WHS handicap index, not vanity stats.
-- A clean, fully tested codebase (93 tests, green CI) that deploys to AWS with a single command.
+- A clean, fully tested codebase (114 tests, green CI) that deploys to AWS with a single command.
 
 ## What we learned
 
@@ -78,7 +78,7 @@ Ten tools, three interactive cards, one running model of your game.
 ## What's next
 
 - Run the stack in a live AWS account and publish the Alexa+ add-on (`alexa-ai new mcp`).
-- OAuth/OIDC via Amazon Cognito with the `resource` parameter, replacing the development `x-user-id` header.
+- Swap the built-in name-and-PIN account linking for a managed identity provider such as Amazon Cognito.
 - Tune the swing thresholds on real range sessions and add face-on detection (sway, hang-back).
 - Shot-shape intent (draw/fade) and green-reading from slope.
 
