@@ -17,7 +17,7 @@ Amazon Developer "Build, Ship, Shape" Hackathon 2026 — deadline **Fri Oct 23, 
 - [x] Devpost writeup drafted (`docs/DEVPOST_SUBMISSION.md`), aligned with the official submission fields
 - [x] Setup and run instructions in the README (required)
 - [x] Simulated Alexa+ host at `/alexa`: voice in and out, real MCP calls, real MCP Apps cards, traffic log
-- [x] Product Feedback for every tool (required), friction log F-1 to F-6 (up to a 10% bonus), feature requests FR-1 to FR-4
+- [x] Product Feedback for every tool (required), friction log F-1 to F-7 (up to a 10% bonus), feature requests FR-1 to FR-4
 
 ## Left
 

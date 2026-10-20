@@ -110,7 +110,7 @@ Paste `docs/PRODUCT_FEEDBACK.md`. It covers each tool used (MCP TypeScript SDK, 
 
 ## Friction log and feature requests (optional, scored)
 
-Paste `docs/FRICTION_LOG.md` (F-1 to F-6, each with task, steps, expected vs. actual, severity, workaround and suggestion) and `docs/FEATURE_REQUESTS.md` (FR-1 to FR-4 with priorities). The rules give up to a 10% bonus for friction logs.
+Paste `docs/FRICTION_LOG.md` (F-1 to F-7, each with task, steps, expected vs. actual, severity, workaround and suggestion) and `docs/FEATURE_REQUESTS.md` (FR-1 to FR-4 with priorities). The rules give up to a 10% bonus for friction logs.
 
 ## Open Source challenge fields
 
