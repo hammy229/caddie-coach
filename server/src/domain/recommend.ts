@@ -1,6 +1,6 @@
 import { bagModel, type ClubModel } from "./dispersion.js";
 import { normalCdf, round1 } from "./stats.js";
-import type { Club, Risk, Shot } from "./types.js";
+import { clubName, type Club, type Risk, type Shot } from "./types.js";
 
 export type Wind = "none" | "head" | "tail" | "left_to_right" | "right_to_left";
 export type Trouble = "none" | "short" | "long";
@@ -85,8 +85,8 @@ export function recommendClub(shots: Shot[], c: Conditions, risk: Risk): Recomme
   }
   reasons.push(
     model.source === "personal"
-      ? `Your ${best.club} has carried ${Math.round(model.meanCarry)} yards on average, give or take ${Math.round(model.sdCarry)}.`
-      : `I don't have enough of your ${best.club} shots yet, so I'm using a typical ${Math.round(model.meanCarry)} yards.`,
+      ? `Your ${clubName(best.club)} has carried ${Math.round(model.meanCarry)} yards on average, give or take ${Math.round(model.sdCarry)}.`
+      : `I don't have enough of your ${clubName(best.club)} shots yet, so I'm using a typical ${Math.round(model.meanCarry)} yards.`,
   );
   if (Math.abs(model.meanLateral) >= 3) {
     reasons.push(
@@ -95,7 +95,7 @@ export function recommendClub(shots: Shot[], c: Conditions, risk: Risk): Recomme
   }
   if (trouble !== "none") {
     reasons.push(
-      `With trouble ${trouble} and a ${risk} game plan, there's about a ${Math.round(best.probInTrouble * 100)}% chance of finding it.`,
+      `With trouble ${trouble} and ${risk === "aggressive" ? "an" : "a"} ${risk} game plan, there's about a ${Math.round(best.probInTrouble * 100)}% chance of finding it.`,
     );
   }
 
