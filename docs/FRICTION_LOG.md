@@ -73,5 +73,5 @@ Platform and tooling friction hit while building. Newest last.
 - **Expected:** A hackathon entrant can install the CLI the rules point to for the Alexa+ track.
 - **Actual:** `AccessDenied ... not authorized to perform: sts:AssumeRole on resource: ...AddOn3PDeveloperToolsRead`. The setup page says the AWS account must be "the one you gave to your Alexa Solutions Architect", and the hackathon rules and resources never say how an entrant gets one or gets allowlisted. Other public entries in the gallery fell back to simulated hosts for the same reason.
 - **Severity:** Critical (blocks the real Alexa+ add-on path for the whole track).
-- **Workaround:** Built a simulated Alexa+ host (`/alexa`, the rules' alternate path) in front of the real MCP server, and asked Amazon for access.
+- **Workaround:** Built a simulated Alexa+ host (`/alexa`, the rules' alternate path) in front of the real MCP server; the server itself is add-on ready, OAuth account linking included.
 - **Suggestion:** Publish the CLI on public npm, or add a self-serve allowlist form for hackathon entrants, and link it from the rules' "How to Enter" section.

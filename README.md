@@ -141,7 +141,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 Working: all ten tools, personal model, pattern detection, swing analysis, strokes gained, course strategy, practice plans, handicap index, round report, all three cards, capture page, contract tests, and the SAM deploy stack (Lambda + Function URL + DynamoDB + Bedrock).
 Working too: a simulated Alexa+ host at `/alexa`.
-In progress: running the stack in a live AWS account, the Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
+Not yet: the live Alexa+ add-on (the `alexa-ai` CLI needs Amazon-side access, see friction log F-7), running the stack in a live AWS account, and testing the capture page on real swings.
 
 See [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) for what's done and what's left, and [docs/DEVPOST_SUBMISSION.md](docs/DEVPOST_SUBMISSION.md) for the submission writeup.
 

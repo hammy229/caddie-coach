@@ -12,7 +12,7 @@
 | UI cards | MCP App resources `ui://caddie-coach/round-report`, `ui://caddie-coach/swing`, `ui://caddie-coach/practice` | Done; conforms to MCP Apps SEP-1865 (ui:// URIs, `text/html;profile=mcp-app`, `_meta.ui.resourceUri` tool linkage, `ui/initialize` + `ui/notifications/tool-result` postMessage), not yet rendered on a live Alexa+ |
 | Hosting | AWS Lambda (container image) behind an HTTPS Function URL, via the Lambda Web Adapter | SAM stack in `infra/`, deploy pending AWS account |
 | Auth | OAuth/OIDC (Amazon Cognito), `resource` = canonical server URI | Planned |
-| Alexa+ bridge | Alexa AI CLI add-on (`alexa-ai new mcp`, `alexa-ai deploy`) | Planned |
+| Alexa+ bridge | Alexa AI CLI add-on (`alexa-ai new mcp`, `alexa-ai deploy`) | Server ready (OAuth built in); CLI access gated by Amazon (F-7). Demo uses the simulated host at `/alexa` |
 
 ## Request flow
 
