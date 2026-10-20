@@ -11,7 +11,7 @@ Amazon Developer "Build, Ship, Shape" Hackathon 2026 — deadline **Fri Oct 23, 
 - [x] Strokes gained, handicap index, hole strategy, practice plans
 - [x] Round report + spoken recap (Bedrock, with template fallback)
 - [x] OAuth 2.1 account linking built into the server (PKCE S256, RFC 9728 and RFC 8414 metadata, refresh tokens)
-- [x] 136 tests, green CI (lint + test + build on Node 22)
+- [x] 138 tests, green CI (lint + test + build on Node 22)
 - [x] AWS deploy stack: SAM — Lambda container + Function URL + DynamoDB + Bedrock IAM
 - [x] Landing page at `GET /`, README, ARCHITECTURE, FRICTION_LOG, PRODUCT_FEEDBACK, DEMO_SCRIPT
 - [x] Devpost writeup drafted (`docs/DEVPOST_SUBMISSION.md`), aligned with the official submission fields
