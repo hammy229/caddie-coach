@@ -66,3 +66,12 @@ Platform and tooling friction hit while building. Newest last.
 - **Severity:** Medium (auth is the step most likely to block linking, and it is the least documented).
 - **Workaround:** Wrote a small stateless OAuth 2.1 server into the MCP server (`server/src/auth/oauth.ts`, PKCE S256, refresh tokens, both metadata documents) with tests for every checklist item.
 - **Suggestion:** Put the CLI install command on the quickstart, publish a minimal reference auth server (or a Cognito recipe) that passes the checklist, and explain why Alexa+ wants the 401 without `WWW-Authenticate`.
+
+### F-7: The Alexa AI CLI is gated behind an Amazon-side allowlist the hackathon never mentions
+- **Task attempted:** Install the `alexa-ai` CLI to create the add-on (`alexa-ai new mcp`).
+- **Steps taken:** `alexa-ai configure` (command not found); `npm install -g @alexa-ai/cli` needs the private CodeArtifact registry first; followed "Set Up Your Development Environment": created a profile that assumes `arn:aws:iam::372468808636:role/AddOn3PDeveloperToolsRead`, then `aws sts get-caller-identity --profile alexa-ai`.
+- **Expected:** A hackathon entrant can install the CLI the rules point to for the Alexa+ track.
+- **Actual:** `AccessDenied ... not authorized to perform: sts:AssumeRole on resource: ...AddOn3PDeveloperToolsRead`. The setup page says the AWS account must be "the one you gave to your Alexa Solutions Architect", and the hackathon rules and resources never say how an entrant gets one or gets allowlisted. Other public entries in the gallery fell back to simulated hosts for the same reason.
+- **Severity:** Critical (blocks the real Alexa+ add-on path for the whole track).
+- **Workaround:** Built a simulated Alexa+ host (`/alexa`, the rules' alternate path) in front of the real MCP server, and asked Amazon for access.
+- **Suggestion:** Publish the CLI on public npm, or add a self-serve allowlist form for hackathon entrants, and link it from the rules' "How to Enter" section.
