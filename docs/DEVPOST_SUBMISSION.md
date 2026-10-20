@@ -19,9 +19,9 @@ Alexa+ caddie that builds a model of how *you* actually hit each club, picks the
 
 ## Tracks & challenges entered
 
-- **Primary:** Alexa+ track — a conversational add-on that does something a static skill cannot: it reasons over your own shot history every turn.
-- **AWS Builder challenge:** the whole thing runs on AWS — Lambda (container image + Web Adapter), an HTTPS Function URL, DynamoDB, and Amazon Bedrock for the spoken recap.
-- **Open Source challenge:** public under the MIT license with a clean history, friction log, and product feedback on the MCP and Alexa+ builder tooling.
+- **Primary track: Alexa+.** A self-hosted MCP server implementing spec **2025-11-25** over Streamable HTTP, with the MCP SDK imported and called at runtime (`server/src/server.ts`, `server/src/index.ts`). It keeps state across sessions and returns MCP Apps cards, two of the "creative" signals the rules call out.
+- **Mini challenge: AWS Builder.** A multi-service integration, documented in `infra/`, `docs/ARCHITECTURE.md` and the Product Feedback below: AWS Lambda (container image + Lambda Web Adapter) behind a Function URL with response streaming, Amazon DynamoDB for per-golfer state, Amazon Bedrock (Converse) for the spoken recap, Amazon ECR and least-privilege IAM, all in one SAM stack.
+- **Mini challenge: Open Source.** _Fill in once the separate contribution exists (see below)._ The rules require a new, additional open-source project or a contribution to an existing public repo; this repo alone does not count.
 
 ---
 
@@ -88,14 +88,45 @@ Ten tools, three interactive cards, one running model of your game.
 
 ---
 
+## Testing instructions (for judges)
+
+Requires Node 22+. No AWS account or credentials are needed to run it.
+
+```bash
+git clone https://github.com/hammy229/caddie-coach && cd caddie-coach/server
+npm install && npm test        # 114 tests
+npm run dev                    # http://localhost:3000/mcp
+npx @modelcontextprotocol/inspector
+# Transport: Streamable HTTP, URL http://localhost:3000/mcp, header x-user-id: demo-user
+```
+
+Try `start_round`, then `log_shot` three times with `distance_miss_yards: -10` to see a pattern raised unprompted, then `recommend_club`, `plan_hole`, `end_round` and `practice_plan`. The swing capture page is at `http://localhost:3000/capture`. Without `OAUTH_SIGNING_SECRET` the server runs in development mode and takes the user from `x-user-id`; with it, `/mcp` requires an OAuth bearer token (see `README.md`).
+
+## Product Feedback
+
+Paste `docs/PRODUCT_FEEDBACK.md`. It covers each tool used (MCP TypeScript SDK, MCP Apps, Alexa+ MCP Toolkit, AWS Lambda + Web Adapter + SAM, DynamoDB, Bedrock, AWS CLI/SAM CLI, MediaPipe, the OAuth layer): what it was used for, what worked, what needs work, onboarding, and whether I would build with it again. The AWS section lists every AWS service and how it is used, which the AWS Builder challenge asks for.
+
+## Friction log and feature requests (optional, scored)
+
+Paste `docs/FRICTION_LOG.md` (F-1 to F-6, each with task, steps, expected vs. actual, severity, workaround and suggestion) and `docs/FEATURE_REQUESTS.md` (FR-1 to FR-4 with priorities). The rules give up to a 10% bonus for friction logs.
+
+## Open Source challenge fields
+
+- **Contribution URL:** _add_
+- **Project repository URL:** https://github.com/hammy229/caddie-coach
+- **GitHub username:** hammy229
+- **What I did, how it works, why it matters:** _add_
+
 ## Links (fill before submitting)
 
 - **GitHub:** https://github.com/hammy229/caddie-coach
 - **Demo video (≤ 3:00, public YouTube/Vimeo):** _add URL_
-- **Live MCP endpoint (Function URL + `/mcp`):** _add after `sam deploy`_
+- **Live MCP endpoint:** optional per the rules (judges test via the repo and video); add if deployed
 - **Landing page:** served at `GET /` — _add deployed URL or screenshot_
 
 ## Submission notes
 
 - Video rules (see `docs/DEMO_SCRIPT.md`): English, no copyrighted music, no third-party trademarks/course logos, best material first.
-- License: MIT (`LICENSE`). History is clean and authored under the builder's identity.
+- License: MIT (`LICENSE`), detected by GitHub and shown in the repo's About section, as the rules require for public repos.
+- The repo was created Oct 14, 2026, inside the submission period, so the "significantly updated" rule for existing projects does not apply.
+- Deadline: **Fri Oct 23, 2026, 12:00 PM PT** (2:00 PM CDT). Video under 3:00, public on YouTube or Vimeo, showing it working on Alexa+.
