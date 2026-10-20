@@ -175,4 +175,35 @@ describe("MCP endpoint over Streamable HTTP", () => {
     expect(res.status).toBe(200);
     expect(await res.text()).toContain("PoseLandmarker");
   });
+
+  it("serves the simulated Alexa+ host", async () => {
+    const res = await fetch(`${baseUrl}/alexa`);
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain("ui/notifications/tool-result");
+    expect(html).toContain("2025-11-25");
+  });
+
+  it("maps a spoken request to a tool call the MCP server accepts", async () => {
+    const res = await fetch(`${baseUrl}/api/intent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ utterance: "Alexa, 150 to the pin into a 10 mile an hour wind. What should I hit?" }),
+    });
+    const intent = (await res.json()) as { kind: string; tool: string; args: Record<string, unknown> };
+    expect(intent).toMatchObject({ kind: "tool", tool: "recommend_club" });
+    const c = await connect("sim");
+    const r = await c.callTool({ name: intent.tool, arguments: intent.args });
+    expect(text(r)).toMatch(/iron|wood|wedge|hybrid|driver/i);
+    await c.close();
+  });
+
+  it("rejects an empty utterance", async () => {
+    const res = await fetch(`${baseUrl}/api/intent`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ utterance: "" }),
+    });
+    expect(res.status).toBe(400);
+  });
 });

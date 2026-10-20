@@ -5,8 +5,10 @@ import { mountOAuth, oauthConfigFromEnv, requireBearer, requireBearerOrPin, type
 import { createNarrator, type Narrator } from "./domain/narrator.js";
 import { buildServer } from "./server.js";
 import { createStore, type StateStore } from "./state/index.js";
+import { ALEXA_HTML } from "./web/alexa.js";
 import { CAPTURE_HTML } from "./web/capture.js";
 import { HOME_HTML } from "./web/home.js";
+import { intentHandler } from "./web/intents.js";
 import { swingUploadHandler } from "./web/swings.js";
 
 export interface AppDeps {
@@ -53,6 +55,14 @@ export function createApp(deps: AppDeps): Express {
 
   app.post("/api/swings", swingAuth, swingUploadHandler(deps.store, today));
 
+  // Simulated Alexa+ host. It identifies the golfer with x-user-id, so it only runs without OAuth.
+  if (!deps.oauth) {
+    app.get("/alexa", (_req, res) => {
+      res.type("html").send(ALEXA_HTML);
+    });
+    app.post("/api/intent", intentHandler);
+  }
+
   app.post("/mcp", mcpAuth, async (req, res) => {
     const userId = res.locals.userId as string;
     const server = buildServer({ store: deps.store, narrator: deps.narrator, userId, today });
@@ -83,8 +93,10 @@ export function createApp(deps: AppDeps): Express {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.PORT ?? 3000);
-  createApp({ store: createStore(), narrator: createNarrator(), oauth: oauthConfigFromEnv() }).listen(port, () => {
+  const oauth = oauthConfigFromEnv();
+  createApp({ store: createStore(), narrator: createNarrator(), oauth }).listen(port, () => {
     console.log(`Caddie Coach MCP server: http://localhost:${port}/mcp`);
     console.log(`Swing capture page:     http://localhost:${port}/capture`);
+    if (!oauth) console.log(`Alexa+ simulator:       http://localhost:${port}/alexa`);
   });
 }

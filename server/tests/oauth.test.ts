@@ -226,6 +226,13 @@ describe("swing uploads under OAuth", () => {
   });
 });
 
+describe("simulated host under OAuth", () => {
+  it("is not served, since it identifies golfers by header", async () => {
+    expect((await fetch(`${base}/alexa`)).status).toBe(404);
+    expect((await fetch(`${base}/api/intent`, { method: "POST" })).status).toBe(404);
+  });
+});
+
 describe("config", () => {
   it("is disabled without a signing secret", () => {
     expect(oauthConfigFromEnv({})).toBeUndefined();
