@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BedrockNarrator, createNarrator, TemplateNarrator } from "../src/domain/narrator.js";
+import { BedrockNarrator, createNarrator, recapPrompt, TemplateNarrator } from "../src/domain/narrator.js";
 import { buildRoundReport, templateRecap } from "../src/domain/report.js";
 import type { Round, UserState } from "../src/domain/types.js";
 
@@ -35,5 +35,20 @@ describe("BedrockNarrator fallback", () => {
   it("trims surrounding whitespace from the model's recap", async () => {
     const n = new BedrockNarrator("m", client(async () => reply("  Solid round.  ")));
     expect(await n.recap(report)).toBe("Solid round.");
+  });
+});
+
+describe("recapPrompt", () => {
+  it("tells the model not to compare on a first round and omits the empty comparison", () => {
+    const p = recapPrompt(report);
+    expect(report.vsPrior.rounds).toBe(0);
+    expect(p).toContain("do not compare");
+    expect(p).not.toContain("vsPrior");
+  });
+
+  it("includes the comparison when earlier rounds exist", () => {
+    const p = recapPrompt({ ...report, vsPrior: { ...report.vsPrior, rounds: 2, priorFairwayPct: 40 } });
+    expect(p).toContain("earlier rounds in vsPrior");
+    expect(p).toContain('"priorFairwayPct":40');
   });
 });
