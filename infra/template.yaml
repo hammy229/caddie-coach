@@ -12,6 +12,31 @@ Parameters:
       Bedrock model ID for the spoken round recap (e.g. us.anthropic.claude-3-5-haiku-20241022-v1:0).
       Leave empty to use the built-in templated recap and skip Bedrock entirely.
 
+  OAuthSigningSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: >
+      Secret used to sign OAuth codes and tokens (32+ random characters). Leave empty to run
+      without OAuth: /mcp then trusts the x-user-id header, for local testing only.
+  OAuthClientId:
+    Type: String
+    Default: alexa-plus
+    Description: OAuth client id the Alexa+ add-on is configured with.
+  OAuthClientSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+    Description: OAuth client secret the Alexa+ add-on is configured with. Required when OAuthSigningSecret is set.
+  OAuthRedirectUris:
+    Type: String
+    Default: ""
+    Description: Comma-separated redirect URIs Alexa+ account linking may return to (shown in the add-on's account-linking settings).
+  PublicBaseUrl:
+    Type: String
+    Default: ""
+    Description: Public https origin of the Function URL, used as the OAuth issuer. Leave empty to derive it from each request.
+
 Globals:
   Function:
     Timeout: 30
@@ -43,6 +68,11 @@ Resources:
         Variables:
           DDB_TABLE: !Ref CaddieTable
           BEDROCK_MODEL_ID: !Ref BedrockModelId
+          OAUTH_SIGNING_SECRET: !Ref OAuthSigningSecret
+          OAUTH_CLIENT_ID: !Ref OAuthClientId
+          OAUTH_CLIENT_SECRET: !Ref OAuthClientSecret
+          OAUTH_REDIRECT_URIS: !Ref OAuthRedirectUris
+          PUBLIC_BASE_URL: !Ref PublicBaseUrl
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref CaddieTable
