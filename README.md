@@ -86,6 +86,11 @@ Copy `.env.example` to `.env`. Everything is optional for local runs.
 | `DDB_TABLE` | DynamoDB table (partition key `userId`, String). Unset = in-memory store |
 | `BEDROCK_MODEL_ID` | Bedrock model for the spoken round recap. Unset = template recap |
 | `AWS_REGION` | Region for DynamoDB and Bedrock |
+| `OAUTH_SIGNING_SECRET` | Turns OAuth on. Secret that signs codes and tokens (32+ random characters). Unset = local dev, identity from `x-user-id` |
+| `OAUTH_CLIENT_SECRET` | Client secret the Alexa+ add-on uses. Required when OAuth is on |
+| `OAUTH_CLIENT_ID` | Client id (default `alexa-plus`) |
+| `OAUTH_REDIRECT_URIS` | Comma-separated redirect URIs account linking may return to |
+| `PUBLIC_BASE_URL` | Public https origin used as the OAuth issuer. Derived from each request when unset |
 
 ## Test
 
@@ -95,7 +100,7 @@ npm run lint
 npm test
 ```
 
-93 tests: the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
+114 tests: the OAuth server (PKCE, refresh, redirect and client checks), the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
 
 ## Deploy to AWS
 
@@ -110,12 +115,27 @@ sam build && sam deploy
 
 ## Connect to Alexa+
 
-Alexa+ needs a remote HTTPS Streamable HTTP endpoint (the Function URL above) and OAuth/OIDC with the `resource` parameter set to the server's canonical URI. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Alexa+ needs a remote HTTPS Streamable HTTP endpoint (the Function URL above) with OAuth account linking. The server includes its own OAuth 2.1 authorization server, so there is nothing else to host:
+
+- `GET /.well-known/oauth-protected-resource` (RFC 9728) and `/.well-known/oauth-authorization-server` (RFC 8414, `S256` PKCE only)
+- `GET|POST /authorize`: a small page where the golfer picks a name and PIN; the same pair always reaches the same data
+- `POST /token`: `authorization_code` with PKCE, and `refresh_token`
+- `/mcp` and `/api/swings` return 401 without a valid bearer token
+
+Codes and tokens are HMAC-signed and stateless, so no extra storage is needed. Turn it on by deploying with `OAuthSigningSecret`, `OAuthClientSecret` and `OAuthRedirectUris` (see [infra/README.md](infra/README.md)), then register the add-on:
+
+```bash
+alexa-ai configure
+alexa-ai new mcp --name "Caddie Coach" --locale en-US --mcp-server-url "https://<function-url>/mcp"
+alexa-ai deploy
+```
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Status
 
 Working: all ten tools, personal model, pattern detection, swing analysis, strokes gained, course strategy, practice plans, handicap index, round report, all three cards, capture page, contract tests, and the SAM deploy stack (Lambda + Function URL + DynamoDB + Bedrock).
-In progress: running the stack in a live AWS account, OAuth/OIDC, Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
+In progress: running the stack in a live AWS account, the Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
 
 See [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) for what's done and what's left, and [docs/DEVPOST_SUBMISSION.md](docs/DEVPOST_SUBMISSION.md) for the submission writeup.
 
