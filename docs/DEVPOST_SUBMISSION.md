@@ -21,7 +21,7 @@ Alexa+ caddie that builds a model of how *you* actually hit each club, picks the
 
 - **Primary track: Alexa+.** A self-hosted MCP server implementing spec **2025-11-25** over Streamable HTTP, with the MCP SDK imported and called at runtime (`server/src/server.ts`, `server/src/index.ts`). It keeps state across sessions and returns MCP Apps cards, two of the "creative" signals the rules call out. The demo runs on a simulated Alexa+ host (`/alexa`, the rules' alternate path) that speaks to the same real MCP server; _replace this sentence if the add-on goes live on a device._
 - **Mini challenge: AWS Builder.** A multi-service integration, documented in `infra/`, `docs/ARCHITECTURE.md` and the Product Feedback below: AWS Lambda (container image + Lambda Web Adapter) behind a Function URL with response streaming, Amazon DynamoDB for per-golfer state, Amazon Bedrock (Converse) for the spoken recap, Amazon ECR and least-privilege IAM, all in one SAM stack.
-- **Mini challenge: Open Source.** _Fill in once the separate contribution exists (see below)._ The rules require a new, additional open-source project or a contribution to an existing public repo; this repo alone does not count.
+- **Mini challenge: Open Source.** [alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth), a new MIT-licensed project: drop-in OAuth 2.1 for any self-hosted MCP server that links to Alexa+. Details in the Open Source fields below.
 
 ---
 
@@ -114,10 +114,12 @@ Paste `docs/FRICTION_LOG.md` (F-1 to F-7, each with task, steps, expected vs. ac
 
 ## Open Source challenge fields
 
-- **Contribution URL:** _add_
+- **Contribution URL:** https://github.com/hammy229/alexa-mcp-oauth
 - **Project repository URL:** https://github.com/hammy229/caddie-coach
 - **GitHub username:** hammy229
-- **What I did, how it works, why it matters:** _add_
+- **What I did:** Built and open-sourced `alexa-mcp-oauth`, a standalone, MIT-licensed TypeScript package that gives any self-hosted MCP server the OAuth 2.1 account linking Alexa+ requires. It grew out of the auth layer I first wrote inside Caddie Coach, generalized for any server: multiple clients, a pluggable sign-in step, the Tier 1 `client_credentials` grant and RFC 8707 resource binding, plus a runnable example MCP server, CI on Node 20 and 22, and 39 tests.
+- **How it works:** One Express router serves RFC 9728 protected-resource metadata, RFC 8414 server metadata (`S256` only), `/authorize` and `/token`; one middleware (`requireBearer`) protects the MCP endpoint and returns the bare 401 Alexa+ expects. Codes, access tokens and refresh tokens are HMAC-signed and typed, so the server stores nothing and runs unchanged on Lambda or behind a tunnel. Sign-in is a `LoginHandler`: a built-in name + PIN option for demos, or your own check against real users. `tests/alexa-checklist.test.ts` has one `describe` per Alexa+ checklist item, including an end-to-end run with the official MCP SDK client; the PKCE code is checked against the RFC 7636 test vector.
+- **Why it matters:** The Alexa+ docs state the account-linking requirements but provide no server that meets them, and auth is where add-ons stall (friction log F-6, feature request FR-1). This turns days of spec reading into `app.use(auth.router)` plus one middleware, documents the trade-offs of stateless tokens honestly, and is usable by every MCP-based Alexa+ entrant.
 
 ## Links (fill before submitting)
 
