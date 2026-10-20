@@ -17,8 +17,7 @@ Pre-seed one earlier round (with a score, par, rating and slope) so the trend, s
 
 ## Recording setup
 
-- **On a real Alexa+ device** once the add-on is live (see `docs/SUBMISSION_CHECKLIST.md`).
-- **Otherwise, the simulated Alexa+ host** (allowed by the rules): `cd server && npm run dev`, open http://localhost:3000/alexa in Chrome, click **New golfer**, then **Load an earlier round**. Speak each line with the mic button (or click the matching chip); the reply is spoken and the cards appear on the device screen. Keep the MCP traffic panel visible for a beat to show the calls hit the real server.
+- **The simulated Alexa+ host** (allowed by the rules): `cd server && npm run dev`, open http://localhost:3000/alexa in Chrome, click **New golfer**, then **Load an earlier round**. Speak each line with the mic button (or click the matching chip); the reply is spoken and the cards appear on the device screen. Keep the MCP traffic panel visible for a beat to show the calls hit the real server.
 - Say on camera that it is a simulated Alexa+ host in front of the real MCP server; the rules require the simulation to be clear.
 - For the swing beat, open the capture link under the device on a phone (it needs HTTPS or localhost: use `cloudflared tunnel --url http://localhost:3000`), swing, then ask "how was that swing?".
 

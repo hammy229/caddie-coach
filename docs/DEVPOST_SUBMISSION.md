@@ -19,7 +19,7 @@ Alexa+ caddie that builds a model of how *you* actually hit each club, picks the
 
 ## Tracks & challenges entered
 
-- **Primary track: Alexa+.** A self-hosted MCP server implementing spec **2025-11-25** over Streamable HTTP, with the MCP SDK imported and called at runtime (`server/src/server.ts`, `server/src/index.ts`). It keeps state across sessions and returns MCP Apps cards, two of the "creative" signals the rules call out. The demo runs on a simulated Alexa+ host (`/alexa`, the rules' alternate path) that speaks to the same real MCP server; _replace this sentence if the add-on goes live on a device._
+- **Primary track: Alexa+.** A self-hosted MCP server implementing spec **2025-11-25** over Streamable HTTP, with the MCP SDK imported and called at runtime (`server/src/server.ts`, `server/src/index.ts`). It keeps state across sessions and returns MCP Apps cards, two of the "creative" signals the rules call out. The demo uses the rules' alternate path, a **simulated Alexa+ experience**: a voice host at `/alexa` that speaks to the same real MCP server, renders its real MCP Apps cards, and logs every MCP message. The real add-on CLI is gated behind an Amazon-side allowlist (friction log F-7); the server is ready for it, OAuth account linking included.
 - **Mini challenge: AWS Builder.** A multi-service integration, documented in `infra/`, `docs/ARCHITECTURE.md` and the Product Feedback below: AWS Lambda (container image + Lambda Web Adapter) behind a Function URL with response streaming, Amazon DynamoDB for per-golfer state, Amazon Bedrock (Converse) for the spoken recap, Amazon ECR and least-privilege IAM, all in one SAM stack.
 - **Mini challenge: Open Source.** [alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth), a new MIT-licensed project: drop-in OAuth 2.1 for any self-hosted MCP server that links to Alexa+. Details in the Open Source fields below.
 
@@ -77,7 +77,7 @@ Ten tools, three interactive cards, one running model of your game.
 
 ## What's next
 
-- Run the stack in a live AWS account and publish the Alexa+ add-on (`alexa-ai new mcp`).
+- Publish the Alexa+ add-on (`alexa-ai new mcp`) once CLI access opens up, and run the stack in a live AWS account.
 - Swap the built-in name-and-PIN account linking for a managed identity provider such as Amazon Cognito.
 - Tune the swing thresholds on real range sessions and add face-on detection (sway, hang-back).
 - Shot-shape intent (draw/fade) and green-reading from slope.

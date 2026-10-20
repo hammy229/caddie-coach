@@ -21,15 +21,10 @@ Amazon Developer "Build, Ship, Shape" Hackathon 2026 — deadline **Fri Oct 23, 
 
 ## Left
 
-The rules do **not** require a live cloud deploy: judges test via the repo and the video. What they do require is a video of it working on Alexa+.
+The rules do **not** require a live cloud deploy: judges test via the repo and the video. For the Alexa+ track they accept a **simulated Alexa+ experience**, shown clearly in the video, and that is the path this submission takes: the real `alexa-ai` CLI is gated behind an Amazon-side allowlist (friction log F-7).
 
-1. [ ] **Alexa+ add-on against a tunnel.** The Alexa+ quickstart allows a tunnel such as cloudflared during development, so the AWS block does not block this.
-   - `brew install cloudflared`, run the server with OAuth on, `cloudflared tunnel --url http://localhost:3000`.
-   - Install the `alexa-ai` CLI (see "Set Up Your Development Environment" in the Alexa+ docs), then `alexa-ai configure` (your Amazon developer login), `alexa-ai new mcp --name "Caddie Coach" --locale en-US --mcp-server-url "https://<tunnel>/mcp"`, fill `addon-package/addon.json` (descriptions, 3–4 example phrases, privacy/terms URLs, 6 icon sizes, a 600×900 image), `alexa-ai deploy`.
-   - Test in the Alexa+ web simulator or on an Echo device.
-   - **Blocker found:** the `alexa-ai` CLI installs from Amazon's private registry by assuming an Amazon-owned role, and that role does not trust this AWS account (`AccessDenied` on `sts:AssumeRole`). Access is granted by Amazon (the docs tie it to an Alexa Solutions Architect). Ask in the hackathon Discord or Devpost discussions, giving AWS account ID `232547853220`.
-   - **Ready fallback:** the simulated Alexa+ host at `/alexa` (the rules' alternate path), already built and tested end to end.
-2. [ ] **Record the demo video** (under 3:00, English, public on YouTube or Vimeo, no third-party trademarks or copyrighted music). Follow `docs/DEMO_SCRIPT.md`; pre-seed one scored round. It must show the project working on Alexa+.
+1. [x] **Alexa+ experience:** the simulated Alexa+ host at `/alexa`, in front of the real MCP server. Voice in and out, real MCP calls, real MCP Apps cards, traffic log. Tested end to end in Chrome.
+2. [ ] **Record the demo video** (under 3:00, English, public on YouTube or Vimeo, no third-party trademarks or copyrighted music). Follow `docs/DEMO_SCRIPT.md`; pre-seed one scored round. Record on the simulator and say on camera that it is a simulated Alexa+ host in front of the real MCP server.
 3. [x] **Open Source mini challenge** ($5,000): [hammy229/alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth), public, MIT (detected by GitHub), CI green, 39 tests. Fields filled in `docs/DEVPOST_SUBMISSION.md`.
 4. [ ] **Submit on Devpost.** Paste from `docs/DEVPOST_SUBMISSION.md`; add the video, repo and Open Source links; pick Alexa+ as the track and both mini challenges.
 5. [ ] *(Optional, bonus)* **Live AWS deploy.** Blocked by the new account's free-plan service control policy (friction log F-3); upgrade the plan, then `cd infra && sam deploy`. Not needed for AWS Builder eligibility, which asks for documented integrations, but a live endpoint is stronger evidence.
