@@ -65,7 +65,12 @@ npm install
 npm run dev
 # MCP endpoint:  http://localhost:3000/mcp
 # Capture page:  http://localhost:3000/capture?user=demo-user
+# Alexa+ sim:    http://localhost:3000/alexa
 ```
+
+### Try it as a voice assistant
+
+Open http://localhost:3000/alexa in Chrome. It is a simulated Alexa+ host (the rules' alternate Alexa+ path): talk with the mic button or type, and it speaks the reply. A small rule-based mapper (`server/src/web/intents.ts`) turns each sentence into one tool call in place of the Alexa+ model; the tool call itself is real MCP JSON-RPC from the browser to `/mcp`, the cards are the real MCP Apps resources rendered in a sandboxed iframe over the `ui/*` postMessage bridge, and every message is shown in the traffic panel. **Load an earlier round** seeds history so trends, strokes gained and handicap have data; the demo requests are one click each. The simulator runs only without OAuth, since it identifies the golfer with `x-user-id`.
 
 Test the tools with the MCP Inspector:
 
@@ -100,7 +105,7 @@ npm run lint
 npm test
 ```
 
-114 tests: the OAuth server (PKCE, refresh, redirect and client checks), the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
+136 tests: the OAuth server (PKCE, refresh, redirect and client checks), the simulated host's intent mapper, the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
 
 ## Deploy to AWS
 
@@ -135,6 +140,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 ## Status
 
 Working: all ten tools, personal model, pattern detection, swing analysis, strokes gained, course strategy, practice plans, handicap index, round report, all three cards, capture page, contract tests, and the SAM deploy stack (Lambda + Function URL + DynamoDB + Bedrock).
+Working too: a simulated Alexa+ host at `/alexa`.
 In progress: running the stack in a live AWS account, the Alexa+ add-on (`alexa-ai new mcp`), testing the capture page on real swings.
 
 See [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) for what's done and what's left, and [docs/DEVPOST_SUBMISSION.md](docs/DEVPOST_SUBMISSION.md) for the submission writeup.
