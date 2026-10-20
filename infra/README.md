@@ -40,6 +40,7 @@ sam deploy --parameter-overrides BedrockModelId=us.anthropic.claude-3-5-haiku-20
 
 ```bash
 URL=<McpEndpoint output>
+# Dev mode (no OAuth) shown; with OAuth on, replace the x-user-id header with: -H "Authorization: Bearer <token>"
 
 curl -s "$URL/health"          # {"ok":true}
 
@@ -52,13 +53,27 @@ curl -s -X POST "$URL/mcp" \
 
 The swing-capture page is served at `$URL/capture`.
 
-## Auth note
+## OAuth
 
-The Function URL is deployed with `AuthType: NONE` so it is reachable for testing and for
-the Alexa+ add-on, which performs OAuth/OIDC at the add-on layer. For a private deploy,
-switch `FunctionUrlConfig.AuthType` to `AWS_IAM` in `template.yaml`, or front the function
-with an OAuth-validating gateway. Until then the server derives the user id from the
-`x-user-id` header; in production that becomes the `sub` claim of the validated token.
+The Function URL is deployed with `AuthType: NONE` so Alexa+ can reach it; the server itself
+enforces OAuth. Deploy with the OAuth parameters to turn it on:
+
+```bash
+sam deploy --parameter-overrides \
+  OAuthSigningSecret=$(openssl rand -hex 32) \
+  OAuthClientSecret=$(openssl rand -hex 24) \
+  OAuthRedirectUris=<redirect URI(s) from the add-on's account-linking settings>
+```
+
+Keep the two secrets: the add-on needs the client id (`alexa-plus` by default) and the client
+secret. Leaving `OAuthSigningSecret` empty runs without OAuth, where `/mcp` trusts the
+`x-user-id` header. That is for local testing only. Reusing the same signing secret on later
+deploys keeps linked golfers working; a new one invalidates every issued token and changes every
+golfer's id.
+
+With OAuth on, the checks below need a bearer token. `GET $URL/.well-known/oauth-authorization-server`
+and `GET $URL/.well-known/oauth-protected-resource` are public, and `POST $URL/mcp` without a
+token returns 401.
 
 ## Teardown
 
