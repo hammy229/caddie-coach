@@ -1,6 +1,7 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import express, { type Express } from "express";
+import express, { type Express, type RequestHandler } from "express";
 import { pathToFileURL } from "node:url";
+import { mountOAuth, oauthConfigFromEnv, requireBearer, requireBearerOrPin, type OAuthConfig } from "./auth/oauth.js";
 import { createNarrator, type Narrator } from "./domain/narrator.js";
 import { buildServer } from "./server.js";
 import { createStore, type StateStore } from "./state/index.js";
@@ -12,6 +13,8 @@ export interface AppDeps {
   store: StateStore;
   narrator: Narrator;
   today?: () => string;
+  /** When set, /mcp requires an OAuth access token. Unset = local dev, identity from `x-user-id`. */
+  oauth?: OAuthConfig;
 }
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -20,13 +23,21 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
  * Streamable HTTP MCP endpoint (spec 2025-11-25) plus the swing capture page.
  * Each MCP request gets a fresh server + transport; durable state lives in the StateStore.
  *
- * User identity: for local development it comes from the `x-user-id` header.
- * In production this must be the `sub` claim of the validated OAuth/OIDC access token.
+ * User identity: with `deps.oauth` it is the `sub` of the validated access token; without it (local
+ * development) it comes from the `x-user-id` header.
  */
 export function createApp(deps: AppDeps): Express {
   const today = deps.today ?? todayISO;
   const app = express();
   app.use(express.json({ limit: "2mb" }));
+
+  const devUser: RequestHandler = (req, res, next) => {
+    res.locals.userId = req.header("x-user-id") ?? "demo-user";
+    next();
+  };
+  if (deps.oauth) mountOAuth(app, deps.oauth);
+  const mcpAuth = deps.oauth ? requireBearer(deps.oauth) : devUser;
+  const swingAuth = deps.oauth ? requireBearerOrPin(deps.oauth) : devUser;
 
   app.get("/", (_req, res) => {
     res.type("html").send(HOME_HTML);
@@ -40,10 +51,10 @@ export function createApp(deps: AppDeps): Express {
     res.type("html").send(CAPTURE_HTML);
   });
 
-  app.post("/api/swings", swingUploadHandler(deps.store, today));
+  app.post("/api/swings", swingAuth, swingUploadHandler(deps.store, today));
 
-  app.post("/mcp", async (req, res) => {
-    const userId = req.header("x-user-id") ?? "demo-user";
+  app.post("/mcp", mcpAuth, async (req, res) => {
+    const userId = res.locals.userId as string;
     const server = buildServer({ store: deps.store, narrator: deps.narrator, userId, today });
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
     res.on("close", () => {
@@ -72,7 +83,7 @@ export function createApp(deps: AppDeps): Express {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.PORT ?? 3000);
-  createApp({ store: createStore(), narrator: createNarrator() }).listen(port, () => {
+  createApp({ store: createStore(), narrator: createNarrator(), oauth: oauthConfigFromEnv() }).listen(port, () => {
     console.log(`Caddie Coach MCP server: http://localhost:${port}/mcp`);
     console.log(`Swing capture page:     http://localhost:${port}/capture`);
   });

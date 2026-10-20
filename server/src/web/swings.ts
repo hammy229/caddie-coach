@@ -28,7 +28,7 @@ export function swingUploadHandler(store: StateStore, today: () => string) {
       res.status(400).json({ error: "Invalid swing capture", details: parsed.error.issues.slice(0, 3) });
       return;
     }
-    const userId = req.header("x-user-id") ?? "demo-user";
+    const userId = res.locals.userId as string;
     try {
       const metrics = analyzeSwing(parsed.data.frames, parsed.data.handed);
       const state = await store.load(userId);
