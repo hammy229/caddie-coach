@@ -1,10 +1,10 @@
 # Submission Checklist
 
-Amazon Developer "Build, Ship, Shape" Hackathon 2026 — deadline **Fri Oct 23, 2026, 2:00 PM CDT**.
+Amazon Developer "Build, Ship, Shape" Hackathon 2026 — deadline **Fri Oct 23, 2026, 12:00 PM PT (2:00 PM CDT)**. Official rules: amazonappdev2026.devpost.com/rules.
 
 ## Done (in the repo)
 
-- [x] Public repo, MIT license, clean history under the builder's identity
+- [x] Public repo, MIT license detected by GitHub (shown in the About section)
 - [x] MCP server: 10 tools, 3 MCP App cards, Streamable HTTP (spec 2025-11-25)
 - [x] Personal dispersion model, caddie engine, pattern detection
 - [x] Swing analysis (pose in browser, keypoints only)
@@ -14,17 +14,23 @@ Amazon Developer "Build, Ship, Shape" Hackathon 2026 — deadline **Fri Oct 23, 
 - [x] 114 tests, green CI (lint + test + build on Node 22)
 - [x] AWS deploy stack: SAM — Lambda container + Function URL + DynamoDB + Bedrock IAM
 - [x] Landing page at `GET /`, README, ARCHITECTURE, FRICTION_LOG, PRODUCT_FEEDBACK, DEMO_SCRIPT
-- [x] Devpost writeup drafted (`docs/DEVPOST_SUBMISSION.md`)
+- [x] Devpost writeup drafted (`docs/DEVPOST_SUBMISSION.md`), aligned with the official submission fields
+- [x] Setup and run instructions in the README (required)
+- [x] Product Feedback for every tool (required), friction log F-1 to F-6 (up to a 10% bonus), feature requests FR-1 to FR-4
 
-## Left — outward actions only you can do
+## Left
 
-Each needs your AWS/Amazon account or identity; none are code gaps.
+The rules do **not** require a live cloud deploy: judges test via the repo and the video. What they do require is a video of it working on Alexa+.
 
-- [ ] **Deploy to AWS.** Install the SAM CLI, start Docker, `aws sso login` (or `aws configure`), then `cd infra && sam build && sam deploy`. Copy the printed Function URL. *(This machine has Docker but no AWS/SAM CLI and no credentials.)*
-- [ ] **Alexa+ add-on.** With Alexa+ for Builders access: `alexa-ai new mcp`, point it at the Function URL + `/mcp`.
-- [ ] **Turn OAuth on at deploy time.** The server now ships its own OAuth 2.1 server (PKCE S256, protected-resource and server metadata, `/authorize`, `/token`). Deploy with `--parameter-overrides OAuthSigningSecret=<32+ random chars> OAuthClientSecret=<random> OAuthRedirectUris=<from the add-on's account-linking settings>`, then enter the same client id/secret in the add-on.
-- [ ] **Record the demo video** (≤ 3:00). Follow `docs/DEMO_SCRIPT.md`. Pre-seed one earlier scored round so trend/strokes-gained/handicap have data. Upload public to YouTube/Vimeo.
-- [ ] **Submit on Devpost.** Paste from `docs/DEVPOST_SUBMISSION.md`, add the video + repo + live endpoint links, confirm track + mini-challenges.
+1. [ ] **Alexa+ add-on against a tunnel.** The Alexa+ quickstart allows a tunnel such as cloudflared during development, so the AWS block does not block this.
+   - `brew install cloudflared`, run the server with OAuth on, `cloudflared tunnel --url http://localhost:3000`.
+   - Install the `alexa-ai` CLI (see "Set Up Your Development Environment" in the Alexa+ docs), then `alexa-ai configure` (your Amazon developer login), `alexa-ai new mcp --name "Caddie Coach" --locale en-US --mcp-server-url "https://<tunnel>/mcp"`, fill `addon-package/addon.json` (descriptions, 3–4 example phrases, privacy/terms URLs, 6 icon sizes, a 600×900 image), `alexa-ai deploy`.
+   - Test in the Alexa+ web simulator or on an Echo device.
+   - Fallback if the add-on stalls: the rules accept a **simulated Alexa+ experience** in a web app, shown clearly in the video.
+2. [ ] **Record the demo video** (under 3:00, English, public on YouTube or Vimeo, no third-party trademarks or copyrighted music). Follow `docs/DEMO_SCRIPT.md`; pre-seed one scored round. It must show the project working on Alexa+.
+3. [ ] **Open Source mini challenge** ($5,000). Needs a **separate** new open-source repo, or a fork/branch/PR to an existing public repo, made during the hackathon. Fill the contribution fields in the writeup.
+4. [ ] **Submit on Devpost.** Paste from `docs/DEVPOST_SUBMISSION.md`; add the video, repo and Open Source links; pick Alexa+ as the track and both mini challenges.
+5. [ ] *(Optional, bonus)* **Live AWS deploy.** Blocked by the new account's free-plan service control policy (friction log F-3); upgrade the plan, then `cd infra && sam deploy`. Not needed for AWS Builder eligibility, which asks for documented integrations, but a live endpoint is stronger evidence.
 
 ## Verify-before-submit (quick)
 
@@ -34,6 +40,6 @@ cd server && npm ci && npm run lint && npm test && npm run build
 
 All green = the artifact judges will clone is healthy.
 
-## Fallback if AWS deploy isn't ready by the deadline
+## After the hackathon
 
-The demo and submission work end-to-end against a **local** server (`npm run dev`, in-memory store) — record the video locally if the live deploy slips. Note the live endpoint as "in progress" in the writeup rather than blocking the submission on it.
+Delete the `caddie-deploy` IAM access key and the downloaded key CSV.
