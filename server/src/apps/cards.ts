@@ -68,7 +68,12 @@ export const ROUND_REPORT_HTML = page(
       stats.appendChild(stat((sg >= 0 ? "+" : "") + sg, "strokes gained"));
     }
     if (r.dominantMiss) stats.appendChild(stat(r.dominantMiss, "typical miss"));
+    if (r.strokes && r.vsPrior.priorAvgStrokes != null) {
+      var d = Math.round(r.strokes - r.vsPrior.priorAvgStrokes);
+      stats.appendChild(stat((d > 0 ? "+" : "") + d, "score vs your average"));
+    }
     if (r.vsPrior.priorFairwayPct !== null && r.vsPrior.fairwayPct !== null) stats.appendChild(stat((r.vsPrior.fairwayPct - r.vsPrior.priorFairwayPct >= 0 ? "+" : "") + (r.vsPrior.fairwayPct - r.vsPrior.priorFairwayPct) + "%", "fairways vs before"));
+    if (r.vsPrior.priorGreenPct !== null && r.vsPrior.greenPct !== null) stats.appendChild(stat((r.vsPrior.greenPct - r.vsPrior.priorGreenPct >= 0 ? "+" : "") + (r.vsPrior.greenPct - r.vsPrior.priorGreenPct) + "%", "approaches vs before"));
     root.appendChild(stats);
     if (r.strengths.length) { root.appendChild(el("div", "label", "Strengths")); root.appendChild(list(r.strengths, "good")); }
     if (r.weaknesses.length) { root.appendChild(el("div", "label", "Work on")); root.appendChild(list(r.weaknesses, "bad")); }

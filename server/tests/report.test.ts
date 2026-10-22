@@ -60,6 +60,38 @@ describe("buildRoundReport", () => {
   });
 });
 
+describe("trend versus earlier rounds", () => {
+  it("says when approach accuracy dropped", () => {
+    const r = buildRoundReport(state(), today);
+    expect(r.vsPrior.priorGreenPct).toBe(100);
+    expect(r.vsPrior.greenPct).toBe(0);
+    expect(r.weaknesses.join(" ")).toContain("Approach accuracy down from 100% in earlier rounds");
+  });
+
+  it("compares the score with the earlier average, in the card data and the recap", () => {
+    const s = state();
+    s.rounds = [{ ...old, strokes: 90 }, today];
+    const r = buildRoundReport(s, today);
+    expect(r.vsPrior.priorAvgStrokes).toBe(90);
+    expect(r.strengths.join(" ")).toContain("Scoring: 6 better than your earlier average of 90");
+    expect(templateRecap(r)).toContain("you shot 84. That's 6 better than your earlier average.");
+  });
+
+  it("flags a score over the earlier average as something to work on", () => {
+    const s = state();
+    s.rounds = [{ ...old, strokes: 80 }, today];
+    const r = buildRoundReport(s, today);
+    expect(r.weaknesses.join(" ")).toContain("Scoring: 4 over your earlier average of 80");
+    expect(templateRecap(r)).toContain("That's 4 over your earlier average.");
+  });
+
+  it("makes no score comparison when no earlier round has a score", () => {
+    const r = buildRoundReport(state(), today);
+    expect(r.vsPrior.priorAvgStrokes).toBeNull();
+    expect(templateRecap(r)).not.toContain("earlier average");
+  });
+});
+
 describe("putting in the round report", () => {
   const putt = (distanceFeet: number, holed: boolean, remainingFeet = 0): Putt => ({
     id: `p${distanceFeet}`, roundId: "r1", distanceFeet, holed, remainingFeet, date: "2026-10-14",

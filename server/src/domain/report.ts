@@ -35,6 +35,8 @@ export interface RoundReport {
     greenPct: number | null;
     priorFairwayPct: number | null;
     priorGreenPct: number | null;
+    /** Average score over earlier rounds that recorded one. */
+    priorAvgStrokes: number | null;
   };
   strengths: string[];
   weaknesses: string[];
@@ -132,8 +134,24 @@ export function buildRoundReport(state: UserState, round: Round): RoundReport {
   if (fairwayPct !== null && priorFairwayPct !== null && fairwayPct > priorFairwayPct) {
     strengths.push(`Fairways up from ${priorFairwayPct}% in earlier rounds.`);
   }
+  if (fairwayPct !== null && priorFairwayPct !== null && fairwayPct < priorFairwayPct) {
+    weaknesses.push(`Fairways down from ${priorFairwayPct}% in earlier rounds.`);
+  }
   if (greenPct !== null && priorGreenPct !== null && greenPct > priorGreenPct) {
     strengths.push(`Approach accuracy up from ${priorGreenPct}% in earlier rounds.`);
+  }
+  if (greenPct !== null && priorGreenPct !== null && greenPct < priorGreenPct) {
+    weaknesses.push(`Approach accuracy down from ${priorGreenPct}% in earlier rounds.`);
+  }
+
+  const priorScores = prior.flatMap((r) => (r.strokes ? [r.strokes] : []));
+  const priorAvgStrokes = priorScores.length ? round1(mean(priorScores)) : null;
+  const scoreDiff = scoreVsPrior(round.strokes ?? null, priorAvgStrokes);
+  if (scoreDiff !== null && scoreDiff < 0) {
+    strengths.push(`Scoring: ${-scoreDiff} better than your earlier average of ${priorAvgStrokes}.`);
+  }
+  if (scoreDiff !== null && scoreDiff > 0) {
+    weaknesses.push(`Scoring: ${scoreDiff} over your earlier average of ${priorAvgStrokes}.`);
   }
 
   return {
@@ -154,15 +172,26 @@ export function buildRoundReport(state: UserState, round: Round): RoundReport {
     strokesGained: { approach: sg.approach, putting: sg.putting, total: sg.total },
     putts: roundPutts.length,
     puttsHoled: roundPutts.filter((p) => p.holed).length,
-    vsPrior: { rounds: prior.length, fairwayPct, greenPct, priorFairwayPct, priorGreenPct },
+    vsPrior: { rounds: prior.length, fairwayPct, greenPct, priorFairwayPct, priorGreenPct, priorAvgStrokes },
     strengths,
     weaknesses,
   };
 }
 
 /** Deterministic spoken recap; the Bedrock narrator falls back to this. */
+/** Strokes versus the earlier average, rounded to whole strokes; null if either is missing or they tie. */
+function scoreVsPrior(strokes: number | null, priorAvg: number | null): number | null {
+  if (!strokes || priorAvg === null) return null;
+  const diff = Math.round(strokes - priorAvg);
+  return diff === 0 ? null : diff;
+}
+
 export function templateRecap(r: RoundReport): string {
   const parts = [`Round at ${r.course}${r.strokes ? `, you shot ${r.strokes}` : ""}.`];
+  const diff = scoreVsPrior(r.strokes, r.vsPrior.priorAvgStrokes);
+  if (diff !== null) {
+    parts.push(`That's ${Math.abs(diff)} ${diff < 0 ? "better than" : "over"} your earlier average.`);
+  }
   if (r.teeShots) parts.push(`You hit ${r.fairwaysHit} of ${r.teeShots} fairways.`);
   if (r.approaches) parts.push(`${r.greensHit} of ${r.approaches} approaches finished close.`);
   if (r.putts >= 3) parts.push(`You putted ${r.strokesGained.putting >= 0 ? "+" : ""}${r.strokesGained.putting} strokes versus the benchmark.`);
