@@ -49,8 +49,8 @@ Platform and tooling friction hit while building. Newest last.
 - **Workaround:** The narrator already falls back to a deterministic template recap, so the product kept working. Verification finished the same day and the live Converse recap then worked.
 - **Suggestion:** Show account-verification status on the console home and in the Bedrock console, and return the same message from the read-only Bedrock APIs so it surfaces before the first invoke.
 
-### F-5: `aws configure` and `aws login` cannot run from an agent or non-interactive shell
-- **Task attempted:** Authenticate the AWS CLI from a terminal session driven by a coding agent (no TTY on stdin).
+### F-5: `aws configure` and `aws login` cannot run from a non-interactive shell
+- **Task attempted:** Authenticate the AWS CLI from a scripted, non-interactive terminal session (no TTY on stdin).
 - **Steps taken:** `aws configure` (prompts for keys); `aws login` (browser flow).
 - **Expected:** A non-interactive path suggested by the error, or a device-code flow.
 - **Actual:** `aws configure` failed with `EOF when reading a line`. `aws login` first failed with `[Errno 22] Invalid argument` because no region was set and it tried to prompt for one; after setting the region it printed an authorize URL, which expired (`The pending authorization to retrieve an SSO token has expired`) during the few minutes it took to find the browser tab.
