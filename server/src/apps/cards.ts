@@ -62,7 +62,7 @@ export const ROUND_REPORT_HTML = page(
     var stats = el("div", "stats");
     if (r.teeShots) stats.appendChild(stat(r.fairwaysHit + "/" + r.teeShots, "fairways"));
     if (r.approaches) stats.appendChild(stat(r.greensHit + "/" + r.approaches, "approaches close"));
-    if (r.putts) stats.appendChild(stat(r.putts + "", "putts"));
+    if (r.putts) stats.appendChild(stat(r.putts + "", r.putts === 1 ? "putt" : "putts"));
     if (r.strokesGained && (r.strokesGained.approach || r.strokesGained.putting)) {
       var sg = r.strokesGained.total;
       stats.appendChild(stat((sg >= 0 ? "+" : "") + sg, "strokes gained"));
