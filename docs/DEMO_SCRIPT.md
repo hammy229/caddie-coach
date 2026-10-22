@@ -14,8 +14,8 @@ Keep the request order: "150 to the pin..." sets the target distance that "7 iro
 
 ## Recording setup
 
-- `cd server && npm run dev`, open http://localhost:3000/alexa in Chrome. Say on camera that it is a simulated Alexa+ host in front of the real MCP server; the rules require the simulation to be clear.
-- Real swing: the camera needs HTTPS, so run `cloudflared tunnel --url http://localhost:3000` and open the printed https URL on the phone, at the same path as the "swing capture page" link under the device (`/capture?user=<golfer id>`), so the swing lands on the same golfer.
+- `cd server && BEDROCK_MODEL_ID=us.amazon.nova-micro-v1:0 npm run dev` (Bedrock writes the recap on camera; plain `npm run dev` uses the template), open http://localhost:3000/alexa in Chrome. Say on camera that it is a simulated Alexa+ host in front of the real MCP server; the rules require the simulation to be clear.
+- Real swing: open the "swing capture page" link under the device (`/capture?user=<golfer id>`) so the swing lands on the same golfer. Easiest is the laptop webcam, which works on localhost. For a phone, the camera needs HTTPS: run `cloudflared tunnel --url http://localhost:3000` and open the printed https URL at the same path.
 - Phone about 3 m away, facing you, whole body in frame. Tap record, swing, then ask "How was that swing?" on the laptop. Do a test swing before recording.
 
 Rules: under 3:00, public YouTube or Vimeo, English, no copyrighted music, no third-party trademarks (no course or brand logos in frame), best material first.
