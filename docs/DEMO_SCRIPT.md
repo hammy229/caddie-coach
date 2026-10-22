@@ -1,24 +1,21 @@
 # Demo Script (under 3:00)
 
-| Time | Beat |
-|---|---|
-| 0:00-0:12 | Problem: club charts are generic; real golfers miss in their own ways and nobody tracks it |
-| 0:12-0:30 | "Start a round at Butler Park, I'm feeling aggressive" |
-| 0:30-0:52 | "How should I play this hole? 520 par 5, water left of the green" -> `plan_hole` gives a tee / lay-up / approach plan from the golfer's own carries |
-| 0:52-1:20 | Log three approach shots by voice; on the third, Alexa+ says unprompted they've all been short |
-| 1:20-1:40 | "150 into a 10 mph wind, water long" -> club and aim point that cite the golfer's own numbers |
-| 1:40-2:05 | Swing on the phone capture page, then "how was that swing?" -> over-the-top coaching, "3 in a row", swing card |
-| 2:05-2:28 | "I'm done, I shot 88" -> round report card: fairways, **strokes gained**, putts, trend, spoken recap |
-| 2:28-2:42 | "I've got 30 minutes, what should I work on?" -> `practice_plan` card targeting the recurring fault + weakest strokes-gained category |
-| 2:42-2:52 | Architecture: Alexa+ add-on, MCP server, pose in browser, DynamoDB, Bedrock |
-| 2:52-3:00 | Impact and what's next |
+| Time | On screen | Say |
+|---|---|---|
+| 0:00-0:15 | On the course or range, club in hand | "Every golf app tells me a 7 iron goes 150. Mine doesn't. I miss short, and nobody keeps track of that. So I built a caddie that does." |
+| 0:15-0:35 | `/alexa` simulator | "This is Caddie Coach, a golf caddie and swing coach for Alexa+. It learns how *you* hit each club, picks your shot, notices your patterns mid-round, and coaches your swing from your phone's camera. This page is a simulated Alexa+ host talking to the real Caddie Coach server. Every call you'll see is real." |
+| 0:35-1:15 | **New golfer** -> **Load an earlier round** -> "Start a round at Butler Park..." -> "150 to the pin..." -> the three short shots | Read each request (or use the mic). On the third shot, pause and let it say the last three approaches came up short. "I didn't ask. It noticed, like a real caddie would." |
+| 1:15-1:50 | Real swing: phone propped up, whole body in frame, hit a ball | "The phone runs pose detection in the browser. Only six body points per frame go to the server, never the video." Swing, then ask "How was that swing?" and show the swing card: tempo, faults, one feel to work on. |
+| 1:50-2:15 | "I'm done. I shot 88." -> report card; "I've got 30 minutes at the range..." -> practice card | "End of the round: fairways, strokes gained, and how I did against my last round. Then it builds a practice plan from whatever is costing me the most strokes." |
+| 2:15-2:45 | README / architecture, MCP traffic panel | "Under the hood: a TypeScript MCP server with ten tools and three MCP App cards, the way Alexa+ add-ons work. Amazon Bedrock writes the spoken summary. DynamoDB stores each golfer's history. It's built to run on Lambda, defined in one SAM template. Login is OAuth 2.1, which I also released as an open-source package for other Alexa+ developers. 145 tests." |
+| 2:45-2:55 | Back on the range | "A caddie that learns how you actually play. Caddie Coach." |
 
-Pre-seed one earlier round (with a score, par, rating and slope) so the trend, strokes gained and handicap have data.
+Keep the request order: "150 to the pin..." sets the target distance that "7 iron came up 10 short" relies on.
 
 ## Recording setup
 
-- **The simulated Alexa+ host** (allowed by the rules): `cd server && npm run dev`, open http://localhost:3000/alexa in Chrome, click **New golfer**, then **Load an earlier round**. Speak each line with the mic button (or click the matching chip); the reply is spoken and the cards appear on the device screen. Keep the MCP traffic panel visible for a beat to show the calls hit the real server.
-- Say on camera that it is a simulated Alexa+ host in front of the real MCP server; the rules require the simulation to be clear.
-- For the swing beat, open the capture link under the device on a phone (it needs HTTPS or localhost: use `cloudflared tunnel --url http://localhost:3000`), swing, then ask "how was that swing?".
+- `cd server && npm run dev`, open http://localhost:3000/alexa in Chrome. Say on camera that it is a simulated Alexa+ host in front of the real MCP server; the rules require the simulation to be clear.
+- Real swing: the camera needs HTTPS, so run `cloudflared tunnel --url http://localhost:3000` and open the printed https URL on the phone, at the same path as the "swing capture page" link under the device (`/capture?user=<golfer id>`), so the swing lands on the same golfer.
+- Phone about 3 m away, facing you, whole body in frame. Tap record, swing, then ask "How was that swing?" on the laptop. Do a test swing before recording.
 
-Rules: public YouTube or Vimeo, English, no copyrighted music, no third-party trademarks (no course or brand logos), best material first.
+Rules: under 3:00, public YouTube or Vimeo, English, no copyrighted music, no third-party trademarks (no course or brand logos in frame), best material first.
