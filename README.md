@@ -105,7 +105,7 @@ npm run lint
 npm test
 ```
 
-138 tests: the OAuth server (PKCE, refresh, redirect and client checks), the simulated host's intent mapper, the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
+145 tests: the OAuth server (PKCE, refresh, redirect and client checks), the simulated host's intent mapper, the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
 
 ## Deploy to AWS
 

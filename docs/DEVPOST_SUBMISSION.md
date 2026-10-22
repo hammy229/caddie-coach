@@ -49,7 +49,7 @@ Ten tools, three interactive cards, one running model of your game.
 ## How we built it
 
 - **Alexa+ add-on → MCP server.** The add-on connects to a remote **Model Context Protocol** server (Streamable HTTP, spec 2025-11-25) exposing ten tools. Alexa+ handles the language; the server owns the golf reasoning, so the intelligence is testable and portable.
-- **Domain engine, no framework magic.** Each capability is a pure TypeScript module — dispersion model, caddie engine, strokes gained, hole strategy, practice-plan scorer, handicap, pattern detector, swing analyzer — with a thin tool wrapper on top. That kept it unit-testable: **138 tests**, including end-to-end contract tests that drive the real HTTP server with the MCP SDK client and walk the full OAuth flow.
+- **Domain engine, no framework magic.** Each capability is a pure TypeScript module — dispersion model, caddie engine, strokes gained, hole strategy, practice-plan scorer, handicap, pattern detector, swing analyzer — with a thin tool wrapper on top. That kept it unit-testable: **145 tests**, including end-to-end contract tests that drive the real HTTP server with the MCP SDK client and walk the full OAuth flow.
 - **Pose in the browser.** The `/capture` page runs MediaPipe Pose client-side and posts only six keypoints per frame to `/api/swings`. No video is stored or transmitted.
 - **AWS.** The server ships as a **container image** on **AWS Lambda** with the **Lambda Web Adapter**, behind an HTTPS **Function URL** (response streaming). State lives in **DynamoDB** (on-demand, single `userId` key). The spoken post-round recap is written by **Amazon Bedrock** (Converse), with a deterministic template fallback when it is not configured. The whole stack is one `sam deploy`.
 - **MCP Apps.** Three tools return interactive HTML cards (round report, swing check, practice plan) following the MCP Apps spec — `ui://` resources, the `text/html;profile=mcp-app` content type, and the `ui/*` postMessage handshake.
@@ -67,7 +67,7 @@ Ten tools, three interactive cards, one running model of your game.
 - Patterns surfaced *mid-round, unprompted*, the way a human caddie would.
 - Private-by-design swing coaching: pose stays in the browser, only keypoints leave the phone.
 - Strokes gained and a real WHS handicap index, not vanity stats.
-- A clean, fully tested codebase (138 tests, green CI) that deploys to AWS with a single command.
+- A clean, fully tested codebase (145 tests, green CI) that deploys to AWS with a single command.
 
 ## What we learned
 
@@ -94,7 +94,7 @@ Requires Node 22+. No AWS account or credentials are needed to run it.
 
 ```bash
 git clone https://github.com/hammy229/caddie-coach && cd caddie-coach/server
-npm install && npm test        # 138 tests
+npm install && npm test        # 145 tests
 npm run dev                    # http://localhost:3000/mcp
 npx @modelcontextprotocol/inspector
 # Transport: Streamable HTTP, URL http://localhost:3000/mcp, header x-user-id: demo-user
