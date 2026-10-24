@@ -4,7 +4,7 @@ A golf caddie and swing coach for Alexa+ that learns your game: your real distan
 
 > Built for the Amazon Developer "Build, Ship, Shape" Hackathon 2026 (Alexa+ track).
 
-**[▶ Watch the demo video](https://youtu.be/xWFLTyOozi0)**
+**Demo video coming soon.**
 
 Most golf apps give you generic club charts. Caddie Coach builds a running model of how *you* actually hit each club, uses it with wind, elevation, hazards and your risk tolerance to pick a club and aim point, plans whole holes for you, notices patterns as you log shots, coaches your swing from your phone camera, tracks your strokes gained and handicap, and turns your weaknesses into a practice plan.
 
