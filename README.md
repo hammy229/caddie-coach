@@ -1,12 +1,13 @@
 # Caddie Coach
 
-A golf caddie and swing coach for Alexa+ that learns your game: your real distances, your misses, and your swing faults.
+**A voice golf caddie and swing coach for Alexa+ that learns how you actually play: your real distances, your misses, and your swing faults. Built as a self-hosted MCP server for the Amazon Alexa+ "Build, Ship, Shape" Hackathon 2026.**
 
-> Built for the Amazon Developer "Build, Ship, Shape" Hackathon 2026 (Alexa+ track).
+[![CI](https://github.com/hammy229/caddie-coach/actions/workflows/ci.yml/badge.svg)](https://github.com/hammy229/caddie-coach/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+![Caddie Coach: "A caddie that learns how you actually play", next to a conversation where it picks a 6-iron for 150 yards into the wind](docs/screenshots/home-hero.png)
 
 **Demo video coming soon.**
-
-Most golf apps give you generic club charts. Caddie Coach builds a running model of how *you* actually hit each club, uses it with wind, elevation, hazards and your risk tolerance to pick a club and aim point, plans whole holes for you, notices patterns as you log shots, coaches your swing from your phone camera, tracks your strokes gained and handicap, and turns your weaknesses into a practice plan.
 
 > "Alexa, start a round at Butler Park. I'm feeling aggressive today."
 > "Alexa, 150 to the pin into a 10 mile an hour wind, water long. What should I hit?"
@@ -19,6 +20,21 @@ Most golf apps give you generic club charts. Caddie Coach builds a running model
 > "Alexa, I've got 30 minutes at the range. What should I work on?"
 > *"You've been coming over the top 3 swings in a row. Headcover gate, 10 minutes: set a headcover just outside the ball..."*
 > "Alexa, I'm done. I shot 88."
+
+## Results
+
+| Claim | Measured | How it is checked |
+|---|---|---|
+| The whole product works end to end | 145 tests in 15 files pass, including contract tests that drive the real HTTP server with the MCP SDK client | `npm test` in `server/`, and CI on every push |
+| It does more than answer questions | 10 MCP tools and 3 MCP App cards: club advice, hole plans, shot logging, putting, swing analysis, practice plans, round reports, and a game profile | [Tools](#tools) below |
+| Advice is personal, not a generic chart | Club choice uses your own carry and miss from your last 20 full swings per club | `server/src/domain`, with unit tests for the dispersion model and caddie engine |
+| Swing coaching works without uploading video | Pose runs in the browser and only 6 body keypoints per frame reach the server | Swing analyzer tests on synthetic good, over-the-top, early-extension, and rushed swings |
+| It deploys with one command | Lambda container behind an HTTPS Function URL, DynamoDB, and Bedrock, from `sam build && sam deploy` | [`infra/template.yaml`](infra/template.yaml) |
+| Its account linking became a library | The OAuth 2.1 server was extracted as [alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth) | That repo's checklist tests |
+
+## Why it matters
+
+Most golf apps hand you a generic club chart. Real golfers miss in personal ways: one player's 7-iron goes 140 and drifts right, another's goes 155 and hooks. Caddie Coach keeps a running model of how you hit each club and uses it, with wind, elevation, hazards, and how much risk you want, to pick a club and an aim point. It runs by voice, so it works mid-round with your hands on a club instead of a phone.
 
 ## How it works
 
@@ -36,13 +52,21 @@ Most golf apps give you generic club charts. Caddie Coach builds a running model
 - **Pattern detection**: every `log_shot` checks for streaks (approaches short or long, tee shots missing one side, a club going shorter than usual) and returns them in the same response, so Alexa+ raises them without being asked.
 - **Swing analysis**: the capture page runs MediaPipe Pose in the browser and uploads 6 body keypoints per frame (no video). The server measures tempo (backswing to downswing ratio), early extension (loss of spine tilt at impact) and over-the-top (hands moving away from the body faster than they drop at the start of the downswing).
 - **Strokes gained**: approach and putting strokes gained against PGA Tour benchmark baselines (Broadie), from the proximity of your logged approaches and the length of your putts.
-- **Course strategy**: `plan_hole` works a hole backwards from a comfortable approach distance — which club off the tee, whether to go for a par 5 or lay up — using your own carries and risk appetite.
+- **Course strategy**: `plan_hole` works a hole backwards from a comfortable approach distance: which club off the tee, whether to go for a par 5 or lay up, using your own carries and risk appetite.
 - **Practice plans**: `practice_plan` scores drills against your recurring swing faults and the part of your game losing the most strokes, then fills the time you have, hardest fix first.
 - **Handicap**: a World Handicap System index and scoring average from your scored rounds (course rating and slope when you give them, par otherwise).
 - **Post-round report**: fairways, approach accuracy, dominant miss, strokes gained, putts, club distances vs your usual, swing faults, and the trend against earlier rounds. Bedrock writes the spoken recap when configured.
 - **MCP Apps**: `end_round` shows a round report card, `analyze_swing` a swing check card, and `practice_plan` a practice plan card.
 
-## Tools
+| Choice | Why |
+|---|---|
+| An MCP server instead of a classic Alexa skill | Alexa+ add-ons speak MCP, so the same server also works in any MCP client, like the MCP Inspector |
+| Pattern checks run inside `log_shot` | Alexa+ can bring up "three approaches short in a row" without being asked |
+| Pose estimation in the browser, keypoints only | Faster, cheaper, and no swing video ever leaves the phone |
+| Stateless HMAC-signed OAuth | No session store to run, so it deploys as one Lambda |
+| A simulated Alexa+ host at `/alexa` | Judges and reviewers can try the real MCP traffic without Amazon-side access |
+
+### Tools
 
 | Tool | What it does |
 |---|---|
@@ -57,7 +81,11 @@ Most golf apps give you generic club charts. Caddie Coach builds a running model
 | `end_round` | Ends the round and returns the report and spoken recap |
 | `get_game_profile` | Your distances, misses, swing faults, strokes gained and handicap index |
 
-## Run locally
+## Tech stack
+
+TypeScript, Node 22, the MCP TypeScript SDK (Streamable HTTP, spec 2025-11-25), MCP Apps, MediaPipe Pose, Vitest, AWS Lambda with the Lambda Web Adapter, DynamoDB, Amazon Bedrock, AWS SAM, GitHub Actions.
+
+## Getting started
 
 Requires Node 22+.
 
@@ -83,7 +111,7 @@ npx @modelcontextprotocol/inspector
 
 The capture page needs camera access, which browsers only allow on `https://` or `localhost`. To use a phone against a local server, put it behind an HTTPS tunnel.
 
-## Configuration
+### Configuration
 
 Copy `.env.example` to `.env`. Everything is optional for local runs.
 
@@ -99,17 +127,7 @@ Copy `.env.example` to `.env`. Everything is optional for local runs.
 | `OAUTH_REDIRECT_URIS` | Comma-separated redirect URIs account linking may return to |
 | `PUBLIC_BASE_URL` | Public https origin used as the OAuth issuer. Derived from each request when unset |
 
-## Test
-
-```bash
-cd server
-npm run lint
-npm test
-```
-
-145 tests: the OAuth server (PKCE, refresh, redirect and client checks), the simulated host's intent mapper, the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client.
-
-## Deploy to AWS
+### Deploy to AWS
 
 The server ships as a container image and runs on AWS Lambda behind an HTTPS Function URL (via the Lambda Web Adapter), with state in DynamoDB and recaps from Bedrock. One command, with the [SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) and Docker:
 
@@ -120,7 +138,7 @@ sam build && sam deploy
 
 `sam deploy` prints the Function URL; the MCP endpoint is that URL + `/mcp`. Full steps, the Bedrock option and teardown are in [infra/README.md](infra/README.md).
 
-## Connect to Alexa+
+### Connect to Alexa+
 
 Alexa+ needs a remote HTTPS Streamable HTTP endpoint (the Function URL above) with OAuth account linking. The server includes its own OAuth 2.1 authorization server, so there is nothing else to host:
 
@@ -139,14 +157,37 @@ alexa-ai deploy
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Status
+## Project structure
 
-Working: all ten tools, personal model, pattern detection, swing analysis, strokes gained, course strategy, practice plans, handicap index, round report, all three cards, capture page, contract tests, and the SAM deploy stack (Lambda + Function URL + DynamoDB + Bedrock).
-Working too: a simulated Alexa+ host at `/alexa`.
-Not yet: the live Alexa+ add-on (the `alexa-ai` CLI needs Amazon-side access, see friction log F-7), running the stack in a live AWS account, and testing the capture page on real swings.
+```
+server/src/tools/    the 10 MCP tools
+server/src/domain/   dispersion model, caddie engine, strokes gained, handicap, swing analyzer, practice plans
+server/src/state/    DynamoDB and in-memory stores
+server/src/auth/     the OAuth 2.1 authorization server
+server/src/apps/     the 3 MCP App cards
+server/src/web/      capture page, simulated Alexa+ host, intent mapper
+server/tests/        unit and end-to-end contract tests
+infra/               AWS SAM template and deploy guide
+docs/                architecture, demo script, friction log, submission notes
+```
 
-See [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) for what's done and what's left, and [docs/DEVPOST_SUBMISSION.md](docs/DEVPOST_SUBMISSION.md) for the submission writeup.
+## Testing
+
+```bash
+cd server
+npm run lint     # type check
+npm test
+```
+
+145 tests: the OAuth server (PKCE, refresh, redirect and client checks), the simulated host's intent mapper, the stats helpers, dispersion model, caddie engine, strokes-gained baselines, practice-plan and hole-strategy engines, handicap index, pattern detector and swing analyzer (on synthetic pose data for good, over-the-top, early-extension and rushed swings), the narrator and spoken recap, the round report, and end-to-end contract tests that drive the real HTTP server with the MCP SDK client. CI runs the type check and tests on every push.
+
+## Limitations and next steps
+
+- The live Alexa+ add-on is not running yet: the `alexa-ai` CLI needs Amazon-side access (friction log F-7). The simulated host at `/alexa` stands in for it.
+- The SAM stack is written and tested locally but has not run in a live AWS account.
+- The capture page has been tested on synthetic pose data, not yet on real swings.
+- See [docs/SUBMISSION_CHECKLIST.md](docs/SUBMISSION_CHECKLIST.md) for what is done and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). Built by [Arham Doshi](https://arhamdoshi.dev).
