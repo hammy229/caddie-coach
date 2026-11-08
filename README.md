@@ -5,6 +5,8 @@
 [![CI](https://github.com/hammy229/caddie-coach/actions/workflows/ci.yml/badge.svg)](https://github.com/hammy229/caddie-coach/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
+**Links:** [Architecture](docs/ARCHITECTURE.md) · [Deploy guide](infra/README.md) · [Hackathon write-up](docs/DEVPOST_SUBMISSION.md) · [OAuth library: alexa-mcp-oauth](https://github.com/hammy229/alexa-mcp-oauth) · [Arham Doshi](https://arhamdoshi.dev) · [LinkedIn](https://linkedin.com/in/arhamdoshi)
+
 ![Caddie Coach: "A caddie that learns how you actually play", next to a conversation where it picks a 6-iron for 150 yards into the wind](docs/screenshots/home-hero.png)
 
 **Demo video coming soon.**
